@@ -1,130 +1,99 @@
-"use client"
+'use client';
 
-import { useState, useEffect, useRef } from "react"
-import { useTheme } from "next-themes"
-import Image from "next/image"
-import Link from "next/link"
+import { useTheme } from 'next-themes';
+import Image from 'next/image';
+import Link from 'next/link';
+import RotatingText from '@/components/anime/RotatingText/RotatingText';
 
 interface LogoProps {
-  size?: "sm" | "md" | "lg"
-  className?: string
+      size?: 'sm' | 'md' | 'lg';
+      className?: string;
 }
 
-export function Logo({ size = "md", className = "" }: LogoProps) {
-  const { theme } = useTheme()
-  const [text, setText] = useState("InfinityCreators")
-  const [isAnimating, setIsAnimating] = useState(false)
-  const [canAnimate, setCanAnimate] = useState(true)
-  const fullText = "InfinityCreators"
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
+export function Logo({ size = 'md', className = '' }: LogoProps) {
+      const { theme } = useTheme();
+      
+      // 根据size属性确定字体大小
+      const getFontSize = () => {
+            switch (size) {
+                  case 'sm':
+                        return 'text-xl';
+                  case 'lg':
+                        return 'text-4xl';
+                  case 'md':
+                  default:
+                        return 'text-2xl';
+            }
+      };
 
-  // Clear any existing timeouts when component unmounts
-  useEffect(() => {
-    return () => {
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-    }
-  }, [])
+      // 根据size属性确定图标大小
+      const getIconSize = () => {
+            switch (size) {
+                  case 'sm':
+                        return 32;
+                  case 'lg':
+                        return 64;
+                  case 'md':
+                  default:
+                        return 48;
+            }
+      };
 
-  // Handle the typewriter animation
-  const handleAnimation = () => {
-    if (isAnimating || !canAnimate) return
+      // 根据size属性确定动态文字的样式
+      const getTextSize = () => {
+            switch (size) {
+                  case 'sm':
+                        return 'text-sm';
+                  case 'lg':
+                        return 'text-xl';
+                  case 'md':
+                  default:
+                        return 'text-base';
+            }
+      };
 
-    setIsAnimating(true)
-    setCanAnimate(false)
-    let currentText = fullText
-    let isErasing = true
-    let charIndex = fullText.length
-
-    // Function to handle the animation step
-    const animateStep = () => {
-      if (isErasing) {
-        // Erasing phase
-        charIndex--
-        currentText = fullText.substring(0, charIndex)
-        setText(currentText)
-
-        if (charIndex <= 0) {
-          isErasing = false
-        }
-      } else {
-        // Typing phase
-        charIndex++
-        currentText = fullText.substring(0, charIndex)
-        setText(currentText)
-
-        if (charIndex >= fullText.length) {
-          // Animation complete
-          setIsAnimating(false)
-          // Allow animation again after a cooldown
-          timeoutRef.current = setTimeout(() => {
-            setCanAnimate(true)
-          }, 1000)
-          return
-        }
-      }
-
-      // Schedule next animation step
-      const speed = isErasing ? 50 : 100 // Faster erasing, slower typing
-      timeoutRef.current = setTimeout(animateStep, speed)
-    }
-
-    // Start the animation
-    animateStep()
-  }
-
-  // Determine font size based on the size prop
-  const getFontSize = () => {
-    switch (size) {
-      case "sm":
-        return "text-xl"
-      case "lg":
-        return "text-4xl"
-      case "md":
-      default:
-        return "text-2xl"
-    }
-  }
-
-  // Determine icon size based on the size prop
-  const getIconSize = () => {
-    switch (size) {
-      case "sm":
-        return 20
-      case "lg":
-        return 40
-      case "md":
-      default:
-        return 30
-    }
-  }
-
-  // Split the text to insert the icon in place of 'C'
-  const beforeC = text.split("C")[0]
-  const afterC = text.split("C")[1] || ""
-
-  return (
-    <Link href="/">
-      <div
-        className={`inline-flex items-center ${getFontSize()} font-bold tracking-tight ${className}`}
-        onMouseEnter={handleAnimation}
-        style={{ fontFamily: "Orbitron, sans-serif" }}
-      >
-        <span className="relative">
-          {beforeC}
-          <span className="relative inline-block" style={{ width: `${getIconSize()}px`, height: `${getIconSize()}px` }}>
-            <Image
-              src={theme === "dark" ? "/logo/moon-w.svg" : "/logo/moon-b.svg"}
-              alt="Moon"
-              width={getIconSize()}
-              height={getIconSize()}
-              className="absolute top-1/2 left-0 transform -translate-y-1/2"
-            />
-          </span>
-          {afterC}
-        </span>
-      </div>
-    </Link>
-  )
+      return (
+            <Link href="/">
+                  <div
+                        className={`inline-flex items-center gap-3 ${getFontSize()} font-bold tracking-tight ${className}`}
+                        style={{ fontFamily: 'Orbitron, sans-serif' }}
+                  >
+                        {/* Logo图标 */}
+                        <div className="relative flex items-center">
+                              <Image
+                                    src={theme === 'dark' ? "/logo/logo-t.svg" : "/logo/logo-t.svg"}
+                                    alt="InfinityCreators Logo"
+                                    width={getIconSize() * 3.3}
+                                    height={getIconSize() * 1.0}
+                              />
+                        </div>
+                        
+                        {/* 文字区域 */}
+                        <div className="flex items-center space-x-2">
+                              
+                              {/* RotatingText组件 */}
+                              <div className={`${getTextSize()} font-medium`}>
+                                    <strong>
+                                          <RotatingText
+                                                texts={['Thinking', 'Creating','Coding','Join us!']}
+                                                mainClassName={`px-2 sm:px-2 md:px-3 ${
+                                                      theme === 'dark' 
+                                                            ? 'bg-gradient-to-r from-indigo-700 to-blue-500' 
+                                                            : 'bg-gradient-to-r from-cyan-400 to-blue-500'
+                                                } text-white overflow-hidden py-0.5 sm:py-1 md:py-2 justify-center rounded-lg`}
+                                                staggerFrom={'last'}
+                                                initial={{ y: '100%' }}
+                                                animate={{ y: 0 }}
+                                                exit={{ y: '-120%' }}
+                                                staggerDuration={0.025}
+                                                splitLevelClassName="overflow-hidden pb-0.5 sm:pb-1 md:pb-1"
+                                                transition={{ type: 'spring', damping: 30, stiffness: 400 }}
+                                                rotationInterval={2000}
+                                          />
+                                    </strong>
+                              </div>
+                        </div>
+                  </div>
+            </Link>
+      );
 }

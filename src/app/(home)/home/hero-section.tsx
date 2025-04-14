@@ -6,6 +6,8 @@ import gsap from "gsap"
 import { beatriceDisplay } from "@/app/fonts"
 import HeroBg from "@/components/bg/hero-bg"
 
+// 调试模式开关
+const DEBUG_MODE = false
 
 export function HeroSection() {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
@@ -24,6 +26,7 @@ export function HeroSection() {
     // 页面加载动画
     const timer = setTimeout(() => {
       setIsLoaded(true)
+      if (DEBUG_MODE) console.log("英雄区域加载完成")
     }, 500)
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -73,6 +76,9 @@ export function HeroSection() {
         stagger: 0.05,
         duration: 0.8,
         ease: "power3.out",
+        onComplete: () => {
+          if (DEBUG_MODE) console.log("标题动画完成")
+        }
       })
     }
   }, [isLoaded])

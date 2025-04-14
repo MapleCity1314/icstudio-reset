@@ -6,6 +6,9 @@ import gsap from "gsap"
 import { ScrollTrigger } from "gsap/ScrollTrigger"
 import { Home, Lightbulb, Flag, Info, Mail } from "lucide-react"
 
+// 调试模式开关
+const DEBUG_MODE = false
+
 // 定义页面各部分及其图标
 const sections = [
   { id: "hero", name: "首页", icon: Home },
@@ -64,12 +67,14 @@ export function CurvedNavigation() {
         scrollTriggers.current = []
 
         // 检查每个部分元素是否存在，并输出调试信息
-        const sectionsExist = sections.map(section => {
-          const exists = !!document.getElementById(section.id)
-          return { id: section.id, exists }
-        })
-        
-        console.log("部分元素存在情况:", sectionsExist)
+        if (DEBUG_MODE) {
+          const sectionsExist = sections.map(section => {
+            const exists = !!document.getElementById(section.id)
+            return { id: section.id, exists }
+          })
+          
+          console.log("部分元素存在情况:", sectionsExist)
+        }
 
         // 创建滚动触发器，当离开首页时显示导航
         const heroEl = document.getElementById("hero")
@@ -78,18 +83,18 @@ export function CurvedNavigation() {
             trigger: heroEl,
             start: "bottom 70%",
             onEnter: () => {
-              console.log("进入hero区域")
+              if (DEBUG_MODE) console.log("进入hero区域")
               setIsVisible(true)
             },
             onLeaveBack: () => {
-              console.log("离开hero区域")
+              if (DEBUG_MODE) console.log("离开hero区域")
               setIsVisible(false)
             },
-            markers: process.env.NODE_ENV === 'development', // 开发环境显示标记
+            markers: DEBUG_MODE, // 只在调试模式下显示标记
           })
           scrollTriggers.current.push(heroTrigger)
         } else {
-          console.warn("未找到hero元素")
+          if (DEBUG_MODE) console.warn("未找到hero元素")
           // 如果找不到hero元素，默认显示导航
           setIsVisible(true)
         }
@@ -103,14 +108,14 @@ export function CurvedNavigation() {
               start: "top 60%", // 更改触发点，使其更容易激活
               end: "bottom 40%", 
               onEnter: () => {
-                console.log(`进入${section.name}区域`)
+                if (DEBUG_MODE) console.log(`进入${section.name}区域`)
                 setActiveIndex(index)
               },
               onEnterBack: () => {
-                console.log(`返回${section.name}区域`)
+                if (DEBUG_MODE) console.log(`返回${section.name}区域`)
                 setActiveIndex(index)
               },
-              markers: process.env.NODE_ENV === 'development', // 开发环境显示标记
+              markers: DEBUG_MODE, // 只在调试模式下显示标记
             })
             scrollTriggers.current.push(trigger)
           }
@@ -162,7 +167,7 @@ export function CurvedNavigation() {
   const scrollToSection = (id: string) => {
     const element = document.getElementById(id)
     if (element) {
-      console.log(`滚动到${id}部分`)
+      if (DEBUG_MODE) console.log(`滚动到${id}部分`)
       
       // 使用更精确的滚动位置计算
       const headerOffset = 80 // 如果有固定头部，调整此值
@@ -174,7 +179,7 @@ export function CurvedNavigation() {
         behavior: "smooth",
       })
     } else {
-      console.warn(`未找到ID为${id}的元素`)
+      if (DEBUG_MODE) console.warn(`未找到ID为${id}的元素`)
     }
   }
 

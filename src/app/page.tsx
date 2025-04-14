@@ -4,13 +4,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { AlertCircle, Mail, MessageSquare, RefreshCw } from "lucide-react";
 import Link from "next/link";
-import { useTranslations } from 'next-intl';
 
 export default function Home() {
+
   redirect("/home");
-
-  const t = useTranslations();
-
   // error page(if u see this page, please contact the developer)
   return (
     <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 relative overflow-hidden">
@@ -47,20 +44,20 @@ export default function Home() {
           <CardContent className="pt-6 pb-8 px-6">
             <div className="text-center mb-6">
               <h1 className="text-3xl font-bold text-red-500 mb-2">
-                {t('common.error.title')}
+                系统错误
               </h1>
               <p className="text-muted-foreground text-lg">
-                {t('common.error.description')}
+                抱歉，系统遇到了一个错误，请稍后再试
               </p>
             </div>
 
             <Alert className="bg-red-50 border-red-200 mb-6">
               <AlertCircle className="h-5 w-5 text-red-500" />
               <AlertTitle className="text-lg font-semibold text-red-700">
-                {t('common.error.title')}
+                系统错误
               </AlertTitle>
               <AlertDescription className="mt-2 text-red-600">
-                {t('common.error.description')}
+                抱歉，系统遇到了一个错误，请稍后再试
               </AlertDescription>
             </Alert>
 
@@ -73,7 +70,7 @@ export default function Home() {
                 >
                   <Link href="mailto:developer@example.com">
                     <Mail className="mr-2 h-4 w-4" />
-                    {t('common.error.contact')}
+                    联系开发者
                   </Link>
                 </Button>
                 <Button
@@ -84,14 +81,14 @@ export default function Home() {
                 >
                   <Link href="/">
                     <RefreshCw className="mr-2 h-4 w-4" />
-                    {t('common.error.refresh')}
+                    刷新页面
                   </Link>
                 </Button>
               </div>
 
               <div className="mt-6 pt-6 border-t border-red-100 flex items-center justify-center gap-2 text-muted-foreground">
                 <MessageSquare className="h-4 w-4" />
-                <span>{t('common.error.errorCode')}: ERR_SERVER_UNAVAILABLE</span>
+                <span>错误代码: ERR_SERVER_UNAVAILABLE</span>
               </div>
             </div>
           </CardContent>
@@ -99,10 +96,10 @@ export default function Home() {
 
         {/* 额外信息 */}
         <div className="text-center text-sm text-muted-foreground">
-          <p>{t('common.error.support.title')}</p>
+          <p>技术支持</p>
           <p className="mt-1">
-            {t('common.error.support.phone')}：<span className="font-medium">+86 155 4164 9093</span> |
-            {t('common.error.support.wechat')}：<span className="font-medium">TechSupport123</span>
+            电话：<span className="font-medium">+86 155 4164 9093</span> |
+            微信：<span className="font-medium">TechSupport123</span>
           </p>
         </div>
       </div>

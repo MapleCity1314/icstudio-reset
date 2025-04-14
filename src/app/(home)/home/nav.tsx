@@ -8,6 +8,9 @@ import { Menu, X } from "lucide-react"
 import { Logo } from "@/components/logo/nav-logo"
 import { cn } from "@/lib/utils"
 
+// 调试模式开关
+const DEBUG_MODE = false
+
 interface NavItem {
   label: string
   href: string
@@ -41,19 +44,44 @@ const HomeNav = () => {
     setMounted(true)
   }, [])
 
-  // Check if mobile
+  // Check if mobile - 检测是否为移动设备并立即应用样式
   useEffect(() => {
+    if (!mounted) return
+    
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024)
+      const isMobileDevice = window.innerWidth < 1024
+      setIsMobile(isMobileDevice)
+      
+      if (DEBUG_MODE) console.log("设备检测:", isMobileDevice ? "移动设备" : "桌面设备")
+      
+      // 立即应用样式而不是等待状态更新
+      if (hamburgerRef.current && desktopMenuRef.current) {
+        if (isMobileDevice) {
+          // 移动设备：显示汉堡按钮，隐藏桌面菜单
+          hamburgerRef.current.style.display = "block"
+          desktopMenuRef.current.style.display = "none"
+        } else if (!isScrolled) {
+          // 桌面设备且未滚动：隐藏汉堡按钮，显示桌面菜单
+          hamburgerRef.current.style.display = "none"
+          desktopMenuRef.current.style.display = "flex"
+        } else {
+          // 桌面设备但已滚动：显示汉堡按钮，隐藏桌面菜单
+          hamburgerRef.current.style.display = "block"
+          desktopMenuRef.current.style.display = "none"
+        }
+      }
     }
 
+    // 初始检测
     checkMobile()
+    
+    // 添加调整大小事件监听器
     window.addEventListener("resize", checkMobile)
 
     return () => {
       window.removeEventListener("resize", checkMobile)
     }
-  }, [])
+  }, [mounted, isScrolled])
 
   // Handle scroll
   useEffect(() => {
@@ -72,7 +100,7 @@ const HomeNav = () => {
     }
   }, [mounted])
 
-  // Animate nav on scroll
+  // Animate nav on scroll and update mobile status
   useEffect(() => {
     if (!navRef.current) return
 
@@ -116,7 +144,7 @@ const HomeNav = () => {
         ease: "power2.out",
       })
 
-      // Show desktop menu items and hide hamburger when at top
+      // Show desktop menu items and hide hamburger when at top (only on desktop)
       if (desktopMenuRef.current && hamburgerRef.current && !isMobile) {
         gsap.to(desktopMenuRef.current, {
           opacity: 1,
@@ -133,15 +161,17 @@ const HomeNav = () => {
     }
   }, [isScrolled, theme, isMobile])
 
-  // Handle menu animations
+  // Handle menu animations - 菜单打开/关闭动画
   useEffect(() => {
     if (!menuItemsRef.current) return
+
+    if (DEBUG_MODE) console.log("菜单状态:", isMenuOpen ? "打开" : "关闭")
 
     if (isMenuOpen) {
       // Animate menu opening
       gsap.fromTo(
         menuItemsRef.current,
-        { opacity: 0, y: -20 },
+        { opacity: 0, y: -20, display: "none" },
         { opacity: 1, y: 0, display: "block", duration: 0.3, ease: "power2.out" },
       )
     } else {
@@ -199,72 +229,82 @@ const HomeNav = () => {
         <Logo size={isScrolled ? "sm" : "md"} />
       </div>
 
-      {/* Desktop Navigation */}
-      <div
-        ref={desktopMenuRef}
-        className={cn("items-center space-x-1", isMobile ? "hidden" : "flex", isScrolled ? "lg:hidden" : "lg:flex")}
-      >
-        {navItems.map((item) => (
-          <Link
-            key={item.label}
-            href={item.href}
-            className={cn(
-              "px-3 py-2 rounded-md text-sm font-medium transition-colors",
-              theme === "dark"
-                ? "text-white/90 hover:text-white hover:bg-white/10"
-                : "text-gray-700 hover:text-black hover:bg-black/5",
-            )}
-          >
-            {item.label}
-          </Link>
-        ))}
-      </div>
-
-      {/* Hamburger Menu (visible on mobile or when scrolled) */}
-      <div ref={menuRef} className={cn("flex items-center", isMobile ? "block" : isScrolled ? "block" : "hidden")}>
+      {/* 右侧区域 - 确保菜单靠右 */}
+      <div className="flex items-center justify-end ml-auto">
+        {/* Desktop Navigation - 只在非移动设备且未滚动时显示 */}
         <div
-          ref={menuItemsRef}
-          className={cn(
-            "absolute top-full right-0 mt-2 p-2 rounded-lg shadow-lg hidden",
-            theme === "dark" ? "bg-gray-900/50" : "bg-white/50", // 菜单背景半透明
-            isScrolled ? "mr-4" : "mr-6",
-          )}
-          style={{
-            backdropFilter: "blur(10px)",
-          }}
+          ref={desktopMenuRef}
+          className="items-center space-x-1 justify-end"
+          style={{ display: "none" }} // 初始隐藏，由JS控制显示
         >
           {navItems.map((item) => (
             <Link
               key={item.label}
               href={item.href}
               className={cn(
-                "block px-4 py-2 rounded-md text-sm font-medium transition-colors",
+                "px-3 py-2 rounded-md text-sm font-medium transition-colors",
                 theme === "dark"
                   ? "text-white/90 hover:text-white hover:bg-white/10"
                   : "text-gray-700 hover:text-black hover:bg-black/5",
               )}
-              onClick={() => setIsMenuOpen(false)}
             >
               {item.label}
             </Link>
           ))}
         </div>
 
-        <div className="flex items-center space-x-2">
+        {/* 汉堡菜单按钮和下拉菜单内容 */}
+        <div className="relative">
+          {/* 汉堡菜单按钮 */}
           <button
             ref={hamburgerRef}
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={cn(
-              "p-2 rounded-md transition-colors",
+              "p-2 rounded-md transition-colors z-50",
               theme === "dark"
                 ? "text-white/90 hover:text-white hover:bg-white/10"
-                : "text-gray-700 hover:text-black hover:bg-black/5",
-              isMobile ? "block" : isScrolled ? "block" : "hidden",
+                : "text-gray-700 hover:text-black hover:bg-black/5"
             )}
-            aria-label="Toggle menu"
+            style={{ display: "none" }} // 初始隐藏，由JS控制显示
+            aria-label="切换菜单"
           >
             {isMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>
+
+          {/* 下拉菜单内容 */}
+          <div
+            ref={menuRef}
+            className="relative"
+          >
+            <div
+              ref={menuItemsRef}
+              className={cn(
+                "absolute top-12 right-0 mt-2 p-2 rounded-lg shadow-lg min-w-[200px] w-48",
+                theme === "dark" ? "bg-gray-900/95" : "bg-white/95", // 几乎不透明
+              )}
+              style={{
+                backdropFilter: "blur(10px)",
+                display: "none", // 初始隐藏
+                zIndex: 40,
+              }}
+            >
+              {navItems.map((item) => (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className={cn(
+                    "block px-4 py-2 rounded-md text-sm font-medium transition-colors w-full text-left",
+                    theme === "dark"
+                      ? "text-white/90 hover:text-white hover:bg-white/10"
+                      : "text-gray-700 hover:text-black hover:bg-black/5",
+                  )}
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
