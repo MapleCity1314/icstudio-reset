@@ -27,6 +27,8 @@ export function CurvedNavigation() {
   const navRef = useRef<HTMLDivElement>(null)
   const itemsRef = useRef<HTMLDivElement>(null)
   const scrollTriggers = useRef<ScrollTrigger[]>([])
+  const lastScrollY = useRef(0)
+  const scrollTimeout = useRef<NodeJS.Timeout>()
 
   // 解决水合问题
   useEffect(() => {
@@ -49,6 +51,56 @@ export function CurvedNavigation() {
     }
   }, [mounted])
 
+  // 处理滚动事件
+  const handleScroll = () => {
+    if (!mounted) return;
+
+    // 清除之前的定时器
+    if (scrollTimeout.current) {
+      clearTimeout(scrollTimeout.current)
+    }
+
+    // 设置新的定时器
+    scrollTimeout.current = setTimeout(() => {
+      const currentScrollY = window.scrollY
+      const windowHeight = window.innerHeight
+      const documentHeight = document.documentElement.scrollHeight
+
+      // 计算滚动方向
+      const isScrollingDown = currentScrollY > lastScrollY.current
+      lastScrollY.current = currentScrollY
+
+      // 检查是否在首页
+      const heroSection = document.getElementById("hero")
+      if (heroSection) {
+        const heroRect = heroSection.getBoundingClientRect()
+        const isInHero = heroRect.bottom > windowHeight * 0.7
+        setIsVisible(!isInHero)
+      }
+
+      // 计算当前活动部分
+      let currentActiveIndex = 0
+      let minDistance = Infinity
+
+      sections.forEach((section, index) => {
+        const element = document.getElementById(section.id)
+        if (element) {
+          const rect = element.getBoundingClientRect()
+          const sectionMiddle = rect.top + rect.height / 2
+          const viewportMiddle = windowHeight / 2
+          const distance = Math.abs(sectionMiddle - viewportMiddle)
+
+          if (distance < minDistance) {
+            minDistance = distance
+            currentActiveIndex = index
+          }
+        }
+      })
+
+      setActiveIndex(currentActiveIndex)
+    }, 100) // 100ms 的防抖
+  }
+
   // 设置滚动监听
   useEffect(() => {
     if (!mounted) return;
@@ -57,110 +109,34 @@ export function CurvedNavigation() {
     if (typeof window !== 'undefined') {
       gsap.registerPlugin(ScrollTrigger)
       
-      // 强制刷新ScrollTrigger以确保它正确初始化
-      ScrollTrigger.refresh()
+      // 添加滚动监听
+      window.addEventListener('scroll', handleScroll, { passive: true })
+      
+      // 初始化滚动位置
+      handleScroll()
 
-      // 延迟执行以确保DOM已完全加载
-      const initTimer = setTimeout(() => {
-        // 清理之前的触发器
-        scrollTriggers.current.forEach(trigger => trigger.kill())
-        scrollTriggers.current = []
-
-        // 检查每个部分元素是否存在，并输出调试信息
-        if (DEBUG_MODE) {
-          const sectionsExist = sections.map(section => {
-            const exists = !!document.getElementById(section.id)
-            return { id: section.id, exists }
-          })
-          
-          console.log("部分元素存在情况:", sectionsExist)
-        }
-
-        // 创建滚动触发器，当离开首页时显示导航
-        const heroEl = document.getElementById("hero")
-        if (heroEl) {
-          const heroTrigger = ScrollTrigger.create({
-            trigger: heroEl,
-            start: "bottom 70%",
-            onEnter: () => {
-              if (DEBUG_MODE) console.log("进入hero区域")
-              setIsVisible(true)
-            },
-            onLeaveBack: () => {
-              if (DEBUG_MODE) console.log("离开hero区域")
-              setIsVisible(false)
-            },
-            markers: DEBUG_MODE, // 只在调试模式下显示标记
-          })
-          scrollTriggers.current.push(heroTrigger)
-        } else {
-          if (DEBUG_MODE) console.warn("未找到hero元素")
-          // 如果找不到hero元素，默认显示导航
-          setIsVisible(true)
-        }
-
-        // 为每个部分创建滚动触发器
-        sections.forEach((section, index) => {
-          const el = document.getElementById(section.id)
-          if (el) {
-            const trigger = ScrollTrigger.create({
-              trigger: el,
-              start: "top 60%", // 更改触发点，使其更容易激活
-              end: "bottom 40%", 
-              onEnter: () => {
-                if (DEBUG_MODE) console.log(`进入${section.name}区域`)
-                setActiveIndex(index)
-              },
-              onEnterBack: () => {
-                if (DEBUG_MODE) console.log(`返回${section.name}区域`)
-                setActiveIndex(index)
-              },
-              markers: DEBUG_MODE, // 只在调试模式下显示标记
-            })
-            scrollTriggers.current.push(trigger)
+      // 导航入场动画
+      if (navRef.current) {
+        gsap.fromTo(
+          navRef.current,
+          { opacity: 0, x: 50 },
+          {
+            opacity: 1,
+            x: 0,
+            duration: 0.8,
+            ease: "power3.out",
+            delay: 0.5,
           }
-        })
-
-        // 导航入场动画
-        if (navRef.current) {
-          const creativeEl = document.getElementById("creative")
-          if (creativeEl) {
-            gsap.fromTo(
-              navRef.current,
-              { opacity: 0, x: 50 },
-              {
-                opacity: 1,
-                x: 0,
-                duration: 0.8,
-                ease: "power3.out",
-                scrollTrigger: {
-                  trigger: creativeEl,
-                  start: "top bottom",
-                },
-              },
-            )
-          }
-        }
-      }, 500) // 延迟500ms执行，确保DOM已加载
+        )
+      }
 
       return () => {
-        clearTimeout(initTimer)
-        scrollTriggers.current.forEach(trigger => trigger.kill())
+        window.removeEventListener('scroll', handleScroll)
+        if (scrollTimeout.current) {
+          clearTimeout(scrollTimeout.current)
+        }
       }
     }
-  }, [mounted])
-
-  // 添加滚动监听的强制刷新
-  useEffect(() => {
-    if (!mounted) return;
-    
-    const refreshTimer = setInterval(() => {
-      if (typeof window !== 'undefined' && ScrollTrigger) {
-        ScrollTrigger.refresh()
-      }
-    }, 3000) // 每3秒刷新一次
-
-    return () => clearInterval(refreshTimer)
   }, [mounted])
 
   // 滚动到指定部分
@@ -169,8 +145,7 @@ export function CurvedNavigation() {
     if (element) {
       if (DEBUG_MODE) console.log(`滚动到${id}部分`)
       
-      // 使用更精确的滚动位置计算
-      const headerOffset = 80 // 如果有固定头部，调整此值
+      const headerOffset = 80
       const elementPosition = element.getBoundingClientRect().top
       const offsetPosition = elementPosition + window.pageYOffset - headerOffset
       
@@ -178,8 +153,6 @@ export function CurvedNavigation() {
         top: offsetPosition,
         behavior: "smooth",
       })
-    } else {
-      if (DEBUG_MODE) console.warn(`未找到ID为${id}的元素`)
     }
   }
 
@@ -192,8 +165,8 @@ export function CurvedNavigation() {
   return (
     <div
       ref={navRef}
-      className={`fixed right-8 top-1/2 -translate-y-1/2 z-40 transition-opacity duration-500 ${
-        isVisible ? "opacity-100" : "opacity-0 pointer-events-none"
+      className={`fixed right-8 top-1/2 -translate-y-1/2 z-40 transition-all duration-500 ${
+        isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10 pointer-events-none"
       }`}
     >
       <div className="relative">
@@ -205,24 +178,21 @@ export function CurvedNavigation() {
 
             // 计算曲线位置
             const distanceFromActive = index - activeIndex
-            const curveX = Math.pow(distanceFromActive, 2) * 8 // 控制曲率
+            const curveX = Math.pow(distanceFromActive, 2) * 8
 
             return (
               <div
                 key={index}
                 className={`flex items-center mb-12 transition-all duration-300 ${
-                  isActive ? "opacity-100" : "opacity-50 hover:opacity-80"
+                  isActive ? "opacity-100 scale-110" : "opacity-50 hover:opacity-80"
                 }`}
                 style={{
                   transform: `translateX(${curveX}px)`,
-                  transition: "transform 0.5s ease-out",
+                  transition: "all 0.5s ease-out",
                 }}
               >
-                {/* 活动项显示文字，非活动项显示图标 */}
                 {isActive ? (
-                  // 活动项 - 显示文字和按钮
                   <div className="flex items-center">
-                    
                     <div 
                       className={`w-12 h-12 rounded-full flex items-center justify-center ${
                         theme === "dark" ? "bg-white/10" : "bg-black/10"
@@ -232,7 +202,6 @@ export function CurvedNavigation() {
                     </div>
                   </div>
                 ) : (
-                  // 非活动项 - 只显示图标
                   <button
                     onClick={() => scrollToSection(section.id)}
                     className={`w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300 ${

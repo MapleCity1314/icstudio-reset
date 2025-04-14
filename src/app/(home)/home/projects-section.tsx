@@ -1,16 +1,17 @@
-"use client"
+'use client';
 
-import { useEffect, useState, useRef } from "react"
-import { useTheme } from "next-themes"
-import gsap from "gsap"
-import { ScrollTrigger } from "gsap/ScrollTrigger"
+import { useEffect, useState, useRef } from 'react';
+import { useTheme } from 'next-themes';
+import gsap from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { ArrowRight } from 'lucide-react';
 import { AiChatSimulator } from './ai-chat-simulator';
 import Image from 'next/image';
+import ImageTrail from '@/components/anime/ImageTrail/ImageTrail';
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
 // 项目数据
 const projects = [
@@ -35,48 +36,48 @@ const projects = [
 ];
 
 export function ProjectsSection() {
-      const [mounted, setMounted] = useState(false)
-      const { theme } = useTheme()
-      const sectionRef = useRef<HTMLDivElement>(null)
-      const projectsRef = useRef<HTMLDivElement>(null)
-      const titleRef = useRef<HTMLHeadingElement>(null)
-      const cardsRef = useRef<HTMLDivElement>(null)
-      const demoRef = useRef<HTMLDivElement>(null)
+      const [mounted, setMounted] = useState(false);
+      const { theme } = useTheme();
+      const sectionRef = useRef<HTMLDivElement>(null);
+      const projectsRef = useRef<HTMLDivElement>(null);
+      const titleRef = useRef<HTMLHeadingElement>(null);
+      const cardsRef = useRef<HTMLDivElement>(null);
+      const demoRef = useRef<HTMLDivElement>(null);
 
       // 解决水合问题
       useEffect(() => {
-            setMounted(true)
-      }, [])
+            setMounted(true);
+      }, []);
 
       useEffect(() => {
-            if (!mounted) return
+            if (!mounted) return;
 
-            const projects = projectsRef.current?.children
-            if (!projects) return
+            const projects = projectsRef.current?.children;
+            if (!projects) return;
 
             // 为每个项目创建动画
             Array.from(projects).forEach((project, index) => {
                   gsap.from(project, {
                         scrollTrigger: {
                               trigger: project,
-                              start: "top bottom-=100",
-                              end: "top center",
+                              start: 'top bottom-=100',
+                              end: 'top center',
                               scrub: 1,
                         },
                         y: 100,
                         opacity: 0,
                         duration: 1,
-                        ease: "power3.out",
-                  })
-            })
+                        ease: 'power3.out',
+                  });
+            });
 
             return () => {
-                  ScrollTrigger.getAll().forEach((trigger) => trigger.kill())
-            }
-      }, [mounted])
+                  ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+            };
+      }, [mounted]);
 
       // 如果组件未挂载，返回空内容
-      if (!mounted) return null
+      if (!mounted) return null;
 
       return (
             <section
@@ -84,11 +85,25 @@ export function ProjectsSection() {
                   ref={sectionRef}
                   className="min-h-screen w-full bg-background transition-colors duration-300"
             >
+                  <ImageTrail
+                        items={[
+                              'https://picsum.photos/id/287/300/300',
+                              'https://picsum.photos/id/1001/300/300',
+                              'https://picsum.photos/id/1025/300/300',
+                              'https://picsum.photos/id/1026/300/300',
+                              'https://picsum.photos/id/1027/300/300',
+                              'https://picsum.photos/id/1028/300/300',
+                              'https://picsum.photos/id/1029/300/300',
+                              'https://picsum.photos/id/1030/300/300',
+                              // ...
+                        ]}
+                        variant={3}
+                  />
                   <div className="container mx-auto px-4 py-20">
                         <h2
                               ref={titleRef}
                               className={`text-4xl md:text-5xl font-bold mb-16 text-center ${
-                                    theme === "dark" ? "text-white" : "text-black"
+                                    theme === 'dark' ? 'text-white' : 'text-black'
                               }`}
                         >
                               Our Projects
@@ -99,7 +114,7 @@ export function ProjectsSection() {
                                     <Card
                                           key={index}
                                           className={`group relative overflow-hidden rounded-lg ${
-                                                theme === "dark" ? "bg-gray-800" : "bg-gray-100"
+                                                theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'
                                           } transition-all duration-300 hover:shadow-xl`}
                                     >
                                           <div className={`h-48 bg-gradient-to-r ${project.color}`}>
@@ -116,14 +131,14 @@ export function ProjectsSection() {
                                           <CardContent className="p-6">
                                                 <h3
                                                       className={`text-xl font-semibold mb-2 ${
-                                                            theme === "dark" ? "text-white" : "text-black"
+                                                            theme === 'dark' ? 'text-white' : 'text-black'
                                                       }`}
                                                 >
                                                       {project.title}
                                                 </h3>
                                                 <p
                                                       className={`${
-                                                            theme === "dark" ? "text-gray-300" : "text-gray-600"
+                                                            theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
                                                       }`}
                                                 >
                                                       {project.description}
@@ -142,5 +157,5 @@ export function ProjectsSection() {
                         </div>
                   </div>
             </section>
-      )
+      );
 }
