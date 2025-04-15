@@ -4,36 +4,302 @@ import { useEffect, useState, useRef } from 'react';
 import { useTheme } from 'next-themes';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Card, CardContent } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { ArrowRight } from 'lucide-react';
-import { AiChatSimulator } from './ai-chat-simulator';
+import { ArrowRight, ExternalLink, Github } from 'lucide-react';
+// import { AiChatSimulator } from './ai-chat-simulator';
 import Image from 'next/image';
-import ImageTrail from '@/components/anime/ImageTrail/ImageTrail';
+import Magnet from '@/components/anime/Magnet/Magnet';
+import { motion } from 'framer-motion';
 
 gsap.registerPlugin(ScrollTrigger);
+
+// 几何形状组件
+interface GeometricShapeProps {
+      className?: string;
+      style?: React.CSSProperties;
+      type?: 'circle' | 'triangle' | 'hexagon' | 'diamond';
+}
+
+const GeometricShape: React.FC<GeometricShapeProps> = ({ className = '', style = {}, type = 'circle' }) => {
+      const shapes = {
+            circle: <div className={`rounded-full ${className}`} style={style}></div>,
+            triangle: (
+                  <div
+                        className={`${className}`}
+                        style={{
+                              ...style,
+                              clipPath: 'polygon(50% 0%, 0% 100%, 100% 100%)',
+                        }}
+                  ></div>
+            ),
+            hexagon: (
+                  <div
+                        className={`${className}`}
+                        style={{
+                              ...style,
+                              clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
+                        }}
+                  ></div>
+            ),
+            diamond: (
+                  <div
+                        className={`${className}`}
+                        style={{
+                              ...style,
+                              clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+                        }}
+                  ></div>
+            ),
+      };
+
+      return shapes[type];
+};
 
 // 项目数据
 const projects = [
       {
-            title: 'AI图像生成器',
-            description: '基于最新的生成模型，创建高质量的艺术作品和视觉内容。',
-            imageUrl: '/placeholder.svg?height=300&width=400',
+            title: '悟创物联',
+            description: '使用Vue + Springboot的物联网平台，实现设备管理、数据采集、告警管理、用户管理、角色管理、权限管理、日志管理、系统管理等功能。',
+            imageUrl: '/projects/big.gif',
             color: 'from-blue-500 to-purple-500',
+            state: '已上线',
+            tags: ['Vue', 'Springboot', 'IoT'],
+            projectLink: 'https://example.com/project1',
+            githubLink: 'https://github.com/example/project1',
       },
       {
-            title: '智能助手平台',
-            description: '为企业和个人提供定制化的AI助手服务，提高工作效率。',
-            imageUrl: '/placeholder.svg?height=300&width=400',
+            title: '判题鸭',
+            description: '基于Vue + Springboot的AI在线判题系统，支持多种编程语言，多种题型，多种难度，多种评测方式，多种评测环境，多种评测数据，多种评测结果，多种评测报告，多种评测分析。',
+            imageUrl: '/projects/ya.jpg',
             color: 'from-purple-500 to-pink-500',
+            state: '已上线',
+            tags: ['Vue', 'Springboot', 'AI'],
+            projectLink: 'https://example.com/project2',
+            githubLink: 'https://github.com/example/project2',
       },
       {
-            title: '数据可视化工具',
-            description: '将复杂数据转化为直观的视觉呈现，帮助用户理解和分析信息。',
+            title: 'API开放平台',
+            description: '基于React + Springboot的API开放平台，支持多种API类型，多种API管理，多种API调用，多种API测试，多种API文档，多种API监控，多种API告警，多种API分析。',
             imageUrl: '/placeholder.svg?height=300&width=400',
             color: 'from-indigo-500 to-blue-500',
+            state: '已上线',
+            tags: ['React', 'Springboot', 'API'],
+            projectLink: 'https://example.com/project3',
+            githubLink: 'https://github.com/example/project3',
       },
+      {
+            title: 'AI多模态MCP交流平台',
+            description: '基于Vercel AI SDK + SpringAI 的AI多模态MCP交流平台，支持多种AI模型，多种AI功能，多种AI应用，多种AI管理，多种AI监控，多种AI告警，多种AI分析。',
+            imageUrl: '/placeholder.svg?height=300&width=400',
+            color: 'from-red-500 to-orange-500',
+            state: '已上线',
+            tags: ['Next.js', 'SpringAI', 'AI'],
+            projectLink: 'https://example.com/project4',
+            githubLink: 'https://github.com/example/project4',
+      },
+      {
+            title: 'IC Studio 官网',
+            description: '如你所见，我们的官网由 React 18 + Next.js 15 开发，包含GSAP，motion，three等多种动画库，包含资源库，展示等多种功能',
+            imageUrl: '/logo/logo-t.png',
+            color: 'from-green-500 to-lime-500',
+            state: '已上线',
+            tags: ['React', 'Next.js', 'GSAP'],
+            projectLink: 'https://example.com/project5',
+            githubLink: 'https://github.com/example/project5',
+      },
+      {
+            title: 'Loome:织',
+            description: '多平台强大的多AI多模态视频编辑器',
+            imageUrl: '/placeholder.svg?height=300&width=400',
+            color: 'from-orange-500 to-yellow-500',
+            state: '研发中',
+            tags: ['Electron', 'React', 'AI'],
+            projectLink: 'https://example.com/project6',
+            githubLink: 'https://github.com/example/project6',
+      }
 ];
+
+// 3D项目卡片组件
+interface ProjectCardProps {
+      project: {
+            title: string;
+            description: string;
+            imageUrl: string;
+            color: string;
+            state: string;
+            tags?: string[];
+            projectLink?: string;
+            githubLink?: string;
+      };
+      index: number;
+      theme: string | undefined;
+}
+
+const ProjectCard: React.FC<ProjectCardProps> = ({ project, index, theme }) => {
+      const cardRef = useRef<HTMLDivElement>(null);
+      const [rotation, setRotation] = useState({ x: 0, y: 0 });
+      const [isHovered, setIsHovered] = useState(false);
+
+      const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+            if (!cardRef.current) return;
+            const card = cardRef.current;
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / 10;
+            const rotateY = (centerX - x) / 10;
+            
+            setRotation({ x: rotateX, y: rotateY });
+      };
+
+      const resetRotation = () => {
+            setRotation({ x: 0, y: 0 });
+      };
+
+      const cardVariants = {
+            hidden: { opacity: 0, y: 50 },
+            visible: { 
+                  opacity: 1, 
+                  y: 0,
+                  transition: { 
+                        duration: 0.8, 
+                        delay: index * 0.2,
+                        ease: [0.25, 0.1, 0.25, 1]
+                  } 
+            }
+      };
+
+      return (
+            <motion.div
+                  ref={cardRef}
+                  className="relative"
+                  initial="hidden"
+                  whileInView="visible"
+                  viewport={{ once: true, amount: 0.2 }}
+                  variants={cardVariants}
+            >
+                  <Card
+                        className={`group relative overflow-hidden rounded-xl ${
+                              theme === 'dark' ? 'bg-gray-800/80' : 'bg-white/90'
+                        } shadow-2xl backdrop-blur-sm transition-all duration-300 border-0 hover:shadow-xl min-h-[400px]`}
+                        style={{
+                              transform: isHovered ? `perspective(1000px) rotateX(${rotation.x}deg) rotateY(${rotation.y}deg) scale3d(1.02, 1.02, 1.02)` : 'perspective(1000px) rotateX(0) rotateY(0)',
+                              transition: 'transform 0.3s ease',
+                        }}
+                        onMouseMove={handleMouseMove}
+                        onMouseEnter={() => setIsHovered(true)}
+                        onMouseLeave={() => {
+                              resetRotation();
+                              setIsHovered(false);
+                        }}
+                  >
+                        {/* 背景图形装饰 */}
+                        <div className="absolute -right-12 -top-12 z-0 opacity-20">
+                              <GeometricShape 
+                                    type={['circle', 'triangle', 'hexagon', 'diamond'][index % 4] as 'circle' | 'triangle' | 'hexagon' | 'diamond'} 
+                                    className={`w-32 h-32 bg-gradient-to-r ${project.color}`} 
+                                    style={{}}
+                              />
+                        </div>
+                        <div className="absolute -left-6 -bottom-6 z-0 opacity-20">
+                              <GeometricShape 
+                                    type={['diamond', 'hexagon', 'triangle', 'circle'][(index + 2) % 4] as 'circle' | 'triangle' | 'hexagon' | 'diamond'} 
+                                    className={`w-20 h-20 bg-gradient-to-r ${project.color}`} 
+                                    style={{}}
+                              />
+                        </div>
+
+                        {/* 项目状态标签 */}
+                        <div className={`absolute top-4 right-4 z-10 px-3 py-1 text-xs font-semibold rounded-full
+                              ${project.state === '已上线' 
+                                    ? 'bg-green-500/20 text-green-500 border border-green-500/30' 
+                                    : 'bg-yellow-500/20 text-yellow-500 border border-yellow-500/30'}`}>
+                              {project.state}
+                        </div>
+
+                        {/* 项目主图 */}
+                        <div className={`relative h-44 bg-gradient-to-r ${project.color} overflow-hidden`}>
+                              <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                                    <Image
+                                          src={project.imageUrl || '/placeholder.svg'}
+                                          alt={project.title}
+                                          width={400}
+                                          height={300}
+                                          className="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity duration-300 transform group-hover:scale-105 transition-transform duration-700"
+                                    />
+                              </div>
+                              
+                              {/* 悬停时显示的链接按钮 */}
+                              <div className="absolute inset-0 flex items-center justify-center gap-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    {project.projectLink && (
+                                          <Magnet>
+                                                <a href={project.projectLink} target="_blank" rel="noopener noreferrer" 
+                                                      className="p-2 bg-white/90 rounded-full shadow-md hover:shadow-lg transition-shadow">
+                                                      <ExternalLink className="w-5 h-5 text-gray-800" />
+                                                </a>
+                                          </Magnet>
+                                    )}
+                                    {project.githubLink && (
+                                          <Magnet>
+                                                <a href={project.githubLink} target="_blank" rel="noopener noreferrer"
+                                                      className="p-2 bg-white/90 rounded-full shadow-md hover:shadow-lg transition-shadow">
+                                                      <Github className="w-5 h-5 text-gray-800" />
+                                                </a>
+                                          </Magnet>
+                                    )}
+                              </div>
+                        </div>
+
+                        {/* 项目内容 */}
+                        <div className="p-6 z-10 relative">
+                              {/* 标题 */}
+                              <h3 className={`text-xl font-bold mb-2 ${
+                                    theme === 'dark' ? 'text-white' : 'text-gray-800'
+                              }`}>
+                                    {project.title}
+                              </h3>
+                              
+                              {/* 标签 */}
+                              <div className="flex flex-wrap gap-2 mb-3">
+                                    {project.tags?.map((tag, idx) => (
+                                          <span key={idx} 
+                                                className={`text-xs px-2 py-1 rounded-full ${
+                                                      theme === 'dark' 
+                                                            ? 'bg-gray-700 text-gray-300' 
+                                                            : 'bg-gray-200 text-gray-700'
+                                                }`}>
+                                                {tag}
+                                          </span>
+                                    ))}
+                              </div>
+                              
+                              {/* 描述 */}
+                              <p className={`${
+                                    theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
+                              } text-sm line-clamp-3 mb-4`}>
+                                    {project.description}
+                              </p>
+                              
+                              {/* 按钮 */}
+                              <Button 
+                                    variant="outline" 
+                                    size="sm" 
+                                    className={`group mt-2 ${
+                                          theme === 'dark'
+                                                ? 'border-gray-700 hover:bg-gray-700'
+                                                : 'border-gray-300 hover:bg-gray-100'
+                                    }`}>
+                                    了解更多
+                                    <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+                              </Button>
+                        </div>
+                  </Card>
+            </motion.div>
+      );
+};
 
 export function ProjectsSection() {
       const [mounted, setMounted] = useState(false);
@@ -41,8 +307,7 @@ export function ProjectsSection() {
       const sectionRef = useRef<HTMLDivElement>(null);
       const projectsRef = useRef<HTMLDivElement>(null);
       const titleRef = useRef<HTMLHeadingElement>(null);
-      const cardsRef = useRef<HTMLDivElement>(null);
-      const demoRef = useRef<HTMLDivElement>(null);
+      // const demoRef = useRef<HTMLDivElement>(null);
 
       // 解决水合问题
       useEffect(() => {
@@ -52,24 +317,21 @@ export function ProjectsSection() {
       useEffect(() => {
             if (!mounted) return;
 
-            const projects = projectsRef.current?.children;
-            if (!projects) return;
-
-            // 为每个项目创建动画
-            Array.from(projects).forEach((project, index) => {
-                  gsap.from(project, {
-                        scrollTrigger: {
-                              trigger: project,
-                              start: 'top bottom-=100',
-                              end: 'top center',
-                              scrub: 1,
-                        },
-                        y: 100,
-                        opacity: 0,
-                        duration: 1,
+            // 标题动画
+            gsap.fromTo(
+                  titleRef.current,
+                  { y: -50, opacity: 0 },
+                  {
+                        y: 0,
+                        opacity: 1,
+                        duration: 1.2,
                         ease: 'power3.out',
-                  });
-            });
+                        scrollTrigger: {
+                              trigger: titleRef.current,
+                              start: 'top 80%',
+                        },
+                  }
+            );
 
             return () => {
                   ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
@@ -83,78 +345,95 @@ export function ProjectsSection() {
             <section
                   id="projects"
                   ref={sectionRef}
-                  className="min-h-screen w-full bg-background transition-colors duration-300"
+                  className="min-h-screen w-full bg-gradient-to-b from-background to-background/80 transition-colors duration-300 py-20 relative overflow-hidden"
             >
-                  <ImageTrail
-                        items={[
-                              'https://picsum.photos/id/287/300/300',
-                              'https://picsum.photos/id/1001/300/300',
-                              'https://picsum.photos/id/1025/300/300',
-                              'https://picsum.photos/id/1026/300/300',
-                              'https://picsum.photos/id/1027/300/300',
-                              'https://picsum.photos/id/1028/300/300',
-                              'https://picsum.photos/id/1029/300/300',
-                              'https://picsum.photos/id/1030/300/300',
-                              // ...
-                        ]}
-                        variant={3}
-                  />
-                  <div className="container mx-auto px-4 py-20">
-                        <h2
-                              ref={titleRef}
-                              className={`text-4xl md:text-5xl font-bold mb-16 text-center ${
-                                    theme === 'dark' ? 'text-white' : 'text-black'
-                              }`}
-                        >
-                              Our Projects
-                        </h2>
+                  {/* 装饰性背景元素 */}
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                        {/* 大圆形 */}
+                        <div className="absolute -top-[20%] -right-[10%] w-[40%] h-[40%] rounded-full bg-gradient-to-r from-blue-500/5 to-purple-500/5 blur-3xl"></div>
+                        {/* 多边形 */}
+                        <div className="absolute top-[30%] -left-[5%] w-[30%] h-[30%] bg-gradient-to-r from-pink-500/5 to-orange-500/5 blur-3xl"
+                              style={{ clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)' }}></div>
+                        {/* 小圆形组 */}
+                        <div className="absolute bottom-[10%] right-[15%] w-[15%] h-[15%] rounded-full bg-gradient-to-r from-green-500/5 to-teal-500/5 blur-2xl"></div>
+                        <div className="absolute bottom-[5%] right-[5%] w-[8%] h-[8%] rounded-full bg-gradient-to-r from-blue-500/5 to-indigo-500/5 blur-xl"></div>
+                  </div>
 
-                        <div ref={projectsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                  <div className="container mx-auto px-4 relative z-10">
+                        {/* 标题部分 */}
+                        <div className="text-center mb-16">
+                              <motion.div 
+                                    initial={{ opacity: 0, y: -20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.8 }}
+                                    className="inline-block mb-4"
+                              >
+                                    <span className={`inline-block px-4 py-1 rounded-full text-sm font-medium
+                                          ${theme === 'dark' 
+                                                ? 'bg-gray-800 text-gray-200 border border-gray-700' 
+                                                : 'bg-gray-100 text-gray-800 border border-gray-200'}`}>
+                                          我们的作品
+                                    </span>
+                              </motion.div>
+                              
+                              <h2
+                                    ref={titleRef}
+                                    className={`text-4xl md:text-5xl font-bold 
+                                          ${theme === 'dark' ? 'text-white' : 'text-black'}`}
+                              >
+                                    <span className="relative">
+                                          创意 
+                                          <span className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-blue-500 to-purple-500"></span>
+                                    </span>
+                                    <span className="mx-2">&</span> 
+                                    <span className="relative">
+                                          技术
+                                          <span className="absolute -bottom-2 left-0 w-full h-1 bg-gradient-to-r from-pink-500 to-orange-500"></span>
+                                    </span>
+                                    <span className="mx-2">的融合</span>
+                              </h2>
+                              
+                              <p className={`mt-4 max-w-2xl mx-auto ${theme === 'dark' ? 'text-gray-300' : 'text-gray-600'}`}>
+                                    每一个项目都是我们团队创意和技术能力的结晶，探索无限可能，创造有价值的体验
+                              </p>
+                        </div>
+
+                        {/* 项目展示网格 - 采用交错的模式 */}
+                        <div 
+                              ref={projectsRef} 
+                              className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 md:gap-10"
+                        >
                               {projects.map((project, index) => (
-                                    <Card
+                                    <ProjectCard 
                                           key={index}
-                                          className={`group relative overflow-hidden rounded-lg ${
-                                                theme === 'dark' ? 'bg-gray-800' : 'bg-gray-100'
-                                          } transition-all duration-300 hover:shadow-xl`}
-                                    >
-                                          <div className={`h-48 bg-gradient-to-r ${project.color}`}>
-                                                <div className="w-full h-full flex items-center justify-center text-white">
-                                                      <Image
-                                                            src={project.imageUrl || '/placeholder.svg'}
-                                                            alt={project.title}
-                                                            width={400}
-                                                            height={300}
-                                                            className="w-full h-full object-cover opacity-80 hover:opacity-100 transition-opacity duration-300"
-                                                      />
-                                                </div>
-                                          </div>
-                                          <CardContent className="p-6">
-                                                <h3
-                                                      className={`text-xl font-semibold mb-2 ${
-                                                            theme === 'dark' ? 'text-white' : 'text-black'
-                                                      }`}
-                                                >
-                                                      {project.title}
-                                                </h3>
-                                                <p
-                                                      className={`${
-                                                            theme === 'dark' ? 'text-gray-300' : 'text-gray-600'
-                                                      }`}
-                                                >
-                                                      {project.description}
-                                                </p>
-                                                <Button variant="outline" size="sm" className="group">
-                                                      了解更多
-                                                      <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                                                </Button>
-                                          </CardContent>
-                                    </Card>
+                                          project={project}
+                                          index={index}
+                                          theme={theme}
+                                    />
                               ))}
                         </div>
 
-                        <div ref={demoRef} className="mt-16">
-                              <AiChatSimulator />
+                        {/* 更多项目按钮 */}
+                        <div className="flex justify-center mt-16">
+                              <Magnet>
+                                    <Button 
+                                          size="lg" 
+                                          className={`group rounded-full ${
+                                                theme === 'dark' 
+                                                      ? 'bg-white text-gray-900 hover:bg-gray-100' 
+                                                      : 'bg-gray-900 text-white hover:bg-gray-800'
+                                          }`}
+                                          onClick={() => window.open('/projects', '_self')}
+                                    >
+                                          查看全部项目
+                                          <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                                    </Button>
+                              </Magnet>
                         </div>
+
+                        {/* <div ref={demoRef} className="mt-24">
+                              <AiChatSimulator />
+                        </div> */}
                   </div>
             </section>
       );

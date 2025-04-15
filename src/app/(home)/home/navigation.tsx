@@ -22,13 +22,13 @@ export function CurvedNavigation() {
   const [activeIndex, setActiveIndex] = useState(0)
   const [isVisible, setIsVisible] = useState(false)
   const [isMobile, setIsMobile] = useState(false)
+  const [isNearFooter, setIsNearFooter] = useState(false)
   const [mounted, setMounted] = useState(false)
   const { theme } = useTheme()
   const navRef = useRef<HTMLDivElement>(null)
   const itemsRef = useRef<HTMLDivElement>(null)
-  const scrollTriggers = useRef<ScrollTrigger[]>([])
   const lastScrollY = useRef(0)
-  const scrollTimeout = useRef<NodeJS.Timeout>()
+  const scrollTimeout = useRef<NodeJS.Timeout>(null)
 
   // 解决水合问题
   useEffect(() => {
@@ -64,10 +64,6 @@ export function CurvedNavigation() {
     scrollTimeout.current = setTimeout(() => {
       const currentScrollY = window.scrollY
       const windowHeight = window.innerHeight
-      const documentHeight = document.documentElement.scrollHeight
-
-      // 计算滚动方向
-      const isScrollingDown = currentScrollY > lastScrollY.current
       lastScrollY.current = currentScrollY
 
       // 检查是否在首页
@@ -76,6 +72,14 @@ export function CurvedNavigation() {
         const heroRect = heroSection.getBoundingClientRect()
         const isInHero = heroRect.bottom > windowHeight * 0.7
         setIsVisible(!isInHero)
+      }
+      
+      // 检查是否靠近页脚
+      const footer = document.querySelector('footer')
+      if (footer) {
+        const footerRect = footer.getBoundingClientRect()
+        const isNearingFooter = footerRect.top < windowHeight + 100
+        setIsNearFooter(isNearingFooter)
       }
 
       // 计算当前活动部分
@@ -165,9 +169,17 @@ export function CurvedNavigation() {
   return (
     <div
       ref={navRef}
-      className={`fixed right-8 top-1/2 -translate-y-1/2 z-40 transition-all duration-500 ${
+      className={`fixed right-8 z-40 transition-all duration-500 ${
         isVisible ? "opacity-100 translate-x-0" : "opacity-0 translate-x-10 pointer-events-none"
+      } ${
+        isNearFooter 
+          ? "bottom-[200px]" 
+          : "top-1/2 -translate-y-1/2"
       }`}
+      style={{
+        transform: isNearFooter ? "translateX(0)" : "",
+        transition: "all 0.5s ease",
+      }}
     >
       <div className="relative">
         {/* 导航项容器 */}
@@ -219,7 +231,7 @@ export function CurvedNavigation() {
         {/* 指示器线 */}
         <div
           className={`absolute right-6 top-0 h-full w-px ${theme === "dark" ? "bg-white/10" : "bg-black/10"}`}
-          style={{ height: "70vh" }}
+          style={{ height: sections.length * 48 + 20 }}
         ></div>
       </div>
     </div>

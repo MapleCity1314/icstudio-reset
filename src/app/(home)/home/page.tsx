@@ -1,4 +1,5 @@
 import CreativeSection from "./creative-section";
+import { Footer } from "./footer";
 import { HeroSection } from "./hero-section";
 import { CurvedNavigation } from "./navigation";
 import { ProjectsSection } from "./projects-section";
@@ -19,6 +20,10 @@ const Page = () => {
 
                   <section id="contact" className="min-h-screen bg-background flex items-center justify-center">
                         <h2 className="text-3xl md:text-5xl font-bold text-foreground">联系方式</h2>
+                  </section>
+
+                  <section id="footer" className="bg-background">
+                        <Footer />
                   </section>
             </main>
       );
