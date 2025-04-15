@@ -1,8 +1,8 @@
-import CreativeSection from "./creative-section";
-import { Footer } from "./footer";
-import { HeroSection } from "./hero-section";
-import { CurvedNavigation } from "./navigation";
-import { ProjectsSection } from "./projects-section";
+import CreativeSection from "./_sections/creative-section";
+import { Footer } from "./_components/footer";
+import { HeroSection } from "./_sections/hero-section";
+import { CurvedNavigation } from "./_components/navigation";
+import { ProjectsSection } from "./_sections/projects-section";
 
 
 const Page = () => {

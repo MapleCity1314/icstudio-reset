@@ -1,5 +1,5 @@
 import { ReactNode } from "react"
-import HomeNav from "./nav"
+import HomeNav from "./_components/nav"
 
 const HomeLayout = ({
         children

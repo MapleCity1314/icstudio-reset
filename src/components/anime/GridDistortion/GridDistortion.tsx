@@ -168,7 +168,8 @@ const GridDistortion: React.FC<GridDistortionProps> = ({
                   requestAnimationFrame(animate);
                   uniforms.time.value += 0.05;
 
-                  const data = dataTexture.image.data;
+                  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+                  const data:any = dataTexture.image.data;
                   for (let i = 0; i < size * size; i++) {
                         data[i * 4] *= relaxation;
                         data[i * 4 + 1] *= relaxation;

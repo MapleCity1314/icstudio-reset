@@ -51,63 +51,61 @@ export function CurvedNavigation() {
     }
   }, [mounted])
 
-  // 处理滚动事件
-  const handleScroll = () => {
-    if (!mounted) return;
-
-    // 清除之前的定时器
-    if (scrollTimeout.current) {
-      clearTimeout(scrollTimeout.current)
-    }
-
-    // 设置新的定时器
-    scrollTimeout.current = setTimeout(() => {
-      const currentScrollY = window.scrollY
-      const windowHeight = window.innerHeight
-      lastScrollY.current = currentScrollY
-
-      // 检查是否在首页
-      const heroSection = document.getElementById("hero")
-      if (heroSection) {
-        const heroRect = heroSection.getBoundingClientRect()
-        const isInHero = heroRect.bottom > windowHeight * 0.7
-        setIsVisible(!isInHero)
-      }
-      
-      // 检查是否靠近页脚
-      const footer = document.querySelector('footer')
-      if (footer) {
-        const footerRect = footer.getBoundingClientRect()
-        const isNearingFooter = footerRect.top < windowHeight + 100
-        setIsNearFooter(isNearingFooter)
-      }
-
-      // 计算当前活动部分
-      let currentActiveIndex = 0
-      let minDistance = Infinity
-
-      sections.forEach((section, index) => {
-        const element = document.getElementById(section.id)
-        if (element) {
-          const rect = element.getBoundingClientRect()
-          const sectionMiddle = rect.top + rect.height / 2
-          const viewportMiddle = windowHeight / 2
-          const distance = Math.abs(sectionMiddle - viewportMiddle)
-
-          if (distance < minDistance) {
-            minDistance = distance
-            currentActiveIndex = index
-          }
-        }
-      })
-
-      setActiveIndex(currentActiveIndex)
-    }, 100) // 100ms 的防抖
-  }
-
   // 设置滚动监听
   useEffect(() => {
     if (!mounted) return;
+
+    // 处理滚动事件
+    const handleScroll = () => {
+      // 清除之前的定时器
+      if (scrollTimeout.current) {
+        clearTimeout(scrollTimeout.current)
+      }
+
+      // 设置新的定时器
+      scrollTimeout.current = setTimeout(() => {
+        const currentScrollY = window.scrollY
+        const windowHeight = window.innerHeight
+        lastScrollY.current = currentScrollY
+
+        // 检查是否在首页
+        const heroSection = document.getElementById("hero")
+        if (heroSection) {
+          const heroRect = heroSection.getBoundingClientRect()
+          const isInHero = heroRect.bottom > windowHeight * 0.7
+          setIsVisible(!isInHero)
+        }
+        
+        // 检查是否靠近页脚
+        const footer = document.querySelector('footer')
+        if (footer) {
+          const footerRect = footer.getBoundingClientRect()
+          const isNearingFooter = footerRect.top < windowHeight + 100
+          setIsNearFooter(isNearingFooter)
+        }
+
+        // 计算当前活动部分
+        let currentActiveIndex = 0
+        let minDistance = Infinity
+
+        sections.forEach((section, index) => {
+          const element = document.getElementById(section.id)
+          if (element) {
+            const rect = element.getBoundingClientRect()
+            const sectionMiddle = rect.top + rect.height / 2
+            const viewportMiddle = windowHeight / 2
+            const distance = Math.abs(sectionMiddle - viewportMiddle)
+
+            if (distance < minDistance) {
+              minDistance = distance
+              currentActiveIndex = index
+            }
+          }
+        })
+
+        setActiveIndex(currentActiveIndex)
+      }, 100) // 100ms 的防抖
+    }
 
     // 注册GSAP插件
     if (typeof window !== 'undefined') {

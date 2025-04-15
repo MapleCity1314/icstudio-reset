@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useCallback } from 'react';
 
 interface circles {
       x: number;
@@ -39,7 +39,7 @@ const HeroBg = ({
       }
 
       // 根据屏幕宽度计算圆形的合适半径
-      function calculateRadius(screenWidth: number) {
+      const calculateRadius = useCallback((screenWidth: number) => {
             // 设置屏幕宽度范围
             const minScreenWidth = 320;
             const maxScreenWidth = 1920;
@@ -55,9 +55,9 @@ const HeroBg = ({
             
             // 计算半径，根据传入的最小和最大半径
             return minRadius + nonLinearScale * (maxRadius - minRadius);
-      }
+      }, [minRadius, maxRadius]);
 
-      function initCircles() {
+      const initCircles = useCallback(() => {
             if (!canvasRef.current) return;
             
             const canvas = canvasRef.current;
@@ -66,19 +66,15 @@ const HeroBg = ({
 
             circlesRef.current = [];
 
-            // 根据屏幕宽度调整圆形数量，小屏幕上减少圆形数量
             const baseCount = Math.max(5, Math.min(20, Math.floor(window.innerWidth / 150)));
             
             for (let i = 0; i < baseCount; i++) {
-                  // 根据当前屏幕宽度计算圆形半径
                   const baseRadius = calculateRadius(window.innerWidth);
-                  // 为每个圆形添加一些随机变化，使它们大小不完全一致
                   const radius = randomBetween(baseRadius * 0.7, baseRadius * 1.3);
 
                   const x = randomBetween(radius, canvas.width - radius);
                   const y = randomBetween(radius, canvas.height - radius);
 
-                  // 速度根据屏幕宽度和传入的速度系数调整
                   const baseSpeed = Math.min(1, window.innerWidth / 1000) * speedFactor;
                   const dx = randomBetween(window.innerWidth / -4000, window.innerWidth / 4000) * baseSpeed;
                   const dy = randomBetween(window.innerWidth / -4000, window.innerWidth / 4000) * baseSpeed;
@@ -87,9 +83,9 @@ const HeroBg = ({
 
                   circlesRef.current.push({ x, y, radius, dx, dy, color });
             }
-      }
+      }, [calculateRadius, speedFactor, colors]);
 
-      function drawCircles(circle: circles) {
+      const drawCircles = useCallback((circle: circles) => {
             if (!canvasRef.current) return;
             const ctx = canvasRef.current.getContext('2d');
             if (!ctx) return;
@@ -97,15 +93,14 @@ const HeroBg = ({
             ctx.beginPath();
             ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2, false);
             
-            // 使用透明度降低视觉冲击
             ctx.globalAlpha = 0.6;
             ctx.fillStyle = circle.color;
             ctx.fill();
             ctx.globalAlpha = 1;
             ctx.closePath();
-      }
+      }, []);
 
-      function animate() {
+      const animate = useCallback(() => {
             if (!canvasRef.current) return;
             const ctx = canvasRef.current.getContext('2d');
             if (!ctx) return;
@@ -127,16 +122,16 @@ const HeroBg = ({
             });
 
             animationFrameRef.current = requestAnimationFrame(animate);
-      }
+      }, [drawCircles]);
 
-      function resizeCanvas() {
+      const resizeCanvas = useCallback(() => {
             if (!canvasRef.current) return;
             
             const currentWidth = window.innerWidth;
-            canvasRef.current.width = currentWidth * 1.2; // 降低为1.2倍以减小绘制区域
+            canvasRef.current.width = currentWidth * 1.2;
             canvasRef.current.height = window.innerHeight;
             initCircles();
-      }
+      }, [initCircles]);
 
       useEffect(() => {
             if (!canvasRef.current) return;
@@ -157,7 +152,7 @@ const HeroBg = ({
                         cancelAnimationFrame(animationFrameRef.current);
                   }
             };
-      }, []);
+      }, [animate, initCircles, resizeCanvas]);
 
       return (
             <div className="h-screen min-h-[30em] flex justify-center items-center relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-[hsla(0,0%,41%,0.25)] before:backdrop-blur-[70px] before:top-0 before:left-0 before:w-full before:h-full before:z-[1] before:mix-blend-overlay">

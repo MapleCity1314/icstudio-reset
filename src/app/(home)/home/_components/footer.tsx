@@ -297,7 +297,7 @@ export function Footer() {
             <div ref={formContainerRef} className="lg:col-span-3 relative">
               <div className="bg-white shadow-xl rounded-xl p-6 border border-gray-100">
                 <h3 ref={formTitleRef} className="text-xl font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
-                  Reach out using our cool contact form.
+                  留言箱
                 </h3>
                 <form onSubmit={handleSubmitMessage}>
                   <div ref={formInputsRef} className="space-y-4">
