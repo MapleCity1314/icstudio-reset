@@ -183,6 +183,7 @@ const CreativeSection = () => {
                         start: 'top 80%',
                   });
                   
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   const containerAnim = gsap.fromTo(
                         containerRef.current,
                         { y: 50, opacity: 0 },
@@ -206,6 +207,7 @@ const CreativeSection = () => {
                         toggleActions: "play none none none", // 只执行一次
                   });
                   
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   const titleAnim = gsap.fromTo(
                         titleRef.current,
                         { y: 50, opacity: 0 },
@@ -229,6 +231,7 @@ const CreativeSection = () => {
                         toggleActions: "play none none none", // 只执行一次
                   });
                   
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   const subtitleAnim = gsap.fromTo(
                         subtitleRef.current,
                         { y: 30, opacity: 0 },
@@ -254,6 +257,7 @@ const CreativeSection = () => {
                         toggleActions: "play none none none", // 只执行一次
                   });
                   
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   const descriptionAnim = gsap.fromTo(
                         paragraphs,
                         { y: 30, opacity: 0 },
@@ -280,6 +284,7 @@ const CreativeSection = () => {
                         toggleActions: "play none none none", // 只执行一次
                   });
                   
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   const techAnim = gsap.fromTo(
                         icons,
                         { y: 30, opacity: 0, scale: 0.8 },
@@ -306,6 +311,7 @@ const CreativeSection = () => {
                         toggleActions: "play none none none", // 只执行一次
                   });
                   
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   const buttonAnim = gsap.fromTo(
                         buttonRef.current,
                         { opacity: 0, y: 10 },

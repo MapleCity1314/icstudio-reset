@@ -337,6 +337,7 @@ export function ProjectsSection() {
                         toggleActions: "play none none none", // 只执行一次
                   });
                   
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   const titleAnim = gsap.fromTo(
                         titleRef.current,
                         { y: -50, opacity: 0 },

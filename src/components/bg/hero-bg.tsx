@@ -21,6 +21,7 @@ interface HeroBgProps {
       speedFactor?: number; // 速度系数，值越大移动越快
       // 其他可选配置
       colors?: string[]; // 自定义颜色
+      className?: string; // 允许额外的类名
 }
 
 const HeroBg = ({
@@ -29,10 +30,12 @@ const HeroBg = ({
       maxRadius = 400, // 默认最大圆半径
       speedFactor = 1.8, // 默认速度系数，提高为原来的1.8倍
       colors = ['#836FFF', '#15F5BA', '#69F2FF'], // 默认颜色
+      className = '', // 默认空类名
 }: HeroBgProps) => {
       const canvasRef = useRef<HTMLCanvasElement>(null);
       const circlesRef = useRef<circles[]>([]);
       const animationFrameRef = useRef<number | undefined>(undefined);
+      const isInitializedRef = useRef<boolean>(false);
 
       function randomBetween(min: number, max: number) {
             return Math.random() * (max - min) + min;
@@ -133,18 +136,29 @@ const HeroBg = ({
             const currentWidth = window.innerWidth;
             canvasRef.current.width = currentWidth * 1.2;
             canvasRef.current.height = window.innerHeight;
-            initCircles();
+            
+            // 只有在初始化时或窗口大小真正改变时才重新初始化圆圈
+            if (!isInitializedRef.current) {
+                  initCircles();
+                  isInitializedRef.current = true;
+            }
       }, [initCircles]);
 
       useEffect(() => {
             if (!canvasRef.current) return;
 
-            resizeCanvas();
-            initCircles();
-            animate();
+            // 确保只初始化一次
+            if (!isInitializedRef.current) {
+                  resizeCanvas();
+                  initCircles();
+                  animate();
+                  isInitializedRef.current = true;
+            }
 
             const handleResize = () => {
                   resizeCanvas();
+                  // 窗口大小变化时重新初始化圆圈
+                  initCircles();
             };
 
             window.addEventListener('resize', handleResize);
@@ -154,21 +168,27 @@ const HeroBg = ({
                   if (animationFrameRef.current) {
                         cancelAnimationFrame(animationFrameRef.current);
                   }
+                  isInitializedRef.current = false;
             };
       }, [animate, initCircles, resizeCanvas]);
 
       return (
-            <div className="h-screen min-h-[30em] flex justify-center items-center relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-[hsla(0,0%,41%,0.25)] before:backdrop-blur-[70px] before:top-0 before:left-0 before:w-full before:h-full before:z-[1] before:mix-blend-overlay">
+            <div className={`h-screen min-h-[30em] flex justify-center items-center relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-[hsla(0,0%,41%,0.25)] before:backdrop-blur-[70px] before:top-0 before:left-0 before:w-full before:h-full before:z-[1] before:mix-blend-overlay ${className}`}>
                   <canvas
                         ref={canvasRef}
                         id="hero-bg"
                         width={500}
                         height={500}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 mix-blend-screen"
+                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 mix-blend-screen pointer-events-none"
                   ></canvas>
-                  {children}
+                  <div className="relative z-10 w-full h-full">
+                        {children}
+                  </div>
             </div>
       );
 };
+
+// 显式设置displayName，用于调试
+HeroBg.displayName = 'HeroBg';
 
 export default HeroBg;

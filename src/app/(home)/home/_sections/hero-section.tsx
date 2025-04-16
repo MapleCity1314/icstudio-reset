@@ -10,11 +10,12 @@ import HeroBg from "@/components/bg/hero-bg"
 const DEBUG_MODE = false
 
 export function HeroSection() {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 })
   const [isLoaded, setIsLoaded] = useState(false)
   const [mounted, setMounted] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
+  const leftTextRef = useRef<HTMLDivElement>(null)
+  const rightTextRef = useRef<HTMLDivElement>(null)
   const { theme } = useTheme()
   // 添加跟踪GSAP动画的ref
   const animations = useRef<gsap.core.Tween[]>([])
@@ -39,19 +40,7 @@ export function HeroSection() {
       }
     }, 500)
 
-    const handleMouseMove = (e: MouseEvent) => {
-      if (containerRef.current) {
-        const rect = containerRef.current.getBoundingClientRect()
-        setMousePosition({
-          x: ((e.clientX - rect.left) / rect.width) * 2 - 1,
-          y: ((e.clientY - rect.top) / rect.height) * 2 - 1,
-        })
-      }
-    }
-
-    window.addEventListener("mousemove", handleMouseMove)
     return () => {
-      window.removeEventListener("mousemove", handleMouseMove)
       clearTimeout(timer)
     }
   }, [])
@@ -102,33 +91,64 @@ export function HeroSection() {
     }
   }, [isLoaded])
 
-  // 计算文本移动效果 - 修改移动系数使效果更加明显
-  const leftTextTransform = {
-    transform: `translate(${mousePosition.x * -15}px, ${mousePosition.y * -15}px)`,
-  }
-
-  const rightTextTransform = {
-    transform: `translate(${mousePosition.x * 15}px, ${mousePosition.y * 15}px)`,
-  }
+  // 添加自动浮动动画替代鼠标跟踪
+  useEffect(() => {
+    if (isLoaded && leftTextRef.current && rightTextRef.current) {
+      // 左侧文本自动浮动
+      const leftAnim = gsap.to(leftTextRef.current, {
+        x: -15,
+        y: -15,
+        duration: 3,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+      })
+      
+      // 右侧文本自动浮动（错开时间）
+      const rightAnim = gsap.to(rightTextRef.current, {
+        x: 15,
+        y: 15,
+        duration: 3.5,
+        ease: "sine.inOut",
+        repeat: -1,
+        yoyo: true,
+        delay: 0.5, // 错开动画时间
+      })
+      
+      // 添加到动画列表以便清理
+      animations.current.push(leftAnim, rightAnim)
+    }
+    
+    return () => {
+      // 清理动画
+      animations.current.forEach(anim => anim.kill())
+      animations.current = []
+    }
+  }, [isLoaded])
 
   // 如果组件未挂载，返回空内容
   if (!mounted) return null
 
   return (
-    <HeroBg minRadius={200} maxRadius={400} speedFactor={1.8} colors={['#836FFF', '#15F5BA', '#69F2FF']}>
+    <HeroBg
+      minRadius={200}
+      maxRadius={400}
+      speedFactor={1.8} 
+      colors={['#836FFF', '#15F5BA', '#69F2FF']}
+    >
       <div
         id="hero" // 添加ID用于滚动指示器
         ref={containerRef}
-        className="relative w-full h-screen overflow-hidden flex items-center justify-center transition-colors duration-300 z-10"
+        className="w-full h-full flex items-center justify-center transition-colors duration-300"
       >
         {/* 左侧文本 - 左上方位置 */}
         <div
+          ref={leftTextRef}
           className={`absolute left-1/4 -translate-x-1/2 top-1/3 -translate-y-1/2 
             transition-all duration-300 ease-out 
             ${isLoaded ? "opacity-100" : "opacity-0 translate-y-[-10px] translate-x-[-10px]"}
           `}
           style={{
-            ...leftTextTransform,
             transitionDelay: "200ms",
           }}
         >
@@ -158,12 +178,12 @@ export function HeroSection() {
 
         {/* 右侧文本 - 右下方位置 */}
         <div
+          ref={rightTextRef}
           className={`absolute right-1/4 translate-x-1/2 bottom-1/3 translate-y-1/2
             transition-all duration-300 ease-out
             ${isLoaded ? "opacity-100" : "opacity-0 translate-y-[10px] translate-x-[10px]"}
           `}
           style={{
-            ...rightTextTransform,
             transitionDelay: "200ms",
           }}
         >
@@ -176,20 +196,6 @@ export function HeroSection() {
             what we build
           </p>
         </div>
-
-        {/* 鼠标跟随光效 */}
-        <div
-          className={`pointer-events-none absolute w-[300px] h-[300px] rounded-full ${
-            theme === "dark"
-              ? "bg-gradient-radial from-white to-transparent opacity-5"
-              : "bg-gradient-radial from-black to-transparent opacity-5"
-          } blur-xl`}
-          style={{
-            transform: `translate(${mousePosition.x * 100}px, ${mousePosition.y * 100}px)`,
-            left: "calc(50% - 150px)",
-            top: "calc(50% - 150px)",
-          }}
-        ></div>
 
         {/* 向下滚动指示器 */}
         <div className="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
