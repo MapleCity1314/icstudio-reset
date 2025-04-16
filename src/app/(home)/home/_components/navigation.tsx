@@ -14,7 +14,7 @@ const sections = [
   { id: "hero", name: "首页", icon: Home },
   { id: "creative", name: "创意", icon: Lightbulb },
   { id: "projects", name: "项目", icon: Flag },
-  { id: "about", name: "关于", icon: Info },
+  { id: "news", name: "关于", icon: Info },
   { id: "contact", name: "联系", icon: Mail },
 ]
 

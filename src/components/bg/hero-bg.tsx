@@ -15,20 +15,20 @@ interface circles {
 interface HeroBgProps {
       children: React.ReactNode;
       // 圆形大小配置
-      minRadius?: number;    // 最小圆半径
-      maxRadius?: number;    // 最大圆半径
+      minRadius?: number; // 最小圆半径
+      maxRadius?: number; // 最大圆半径
       // 动画速度控制
-      speedFactor?: number;  // 速度系数，值越大移动越快
+      speedFactor?: number; // 速度系数，值越大移动越快
       // 其他可选配置
-      colors?: string[];     // 自定义颜色
+      colors?: string[]; // 自定义颜色
 }
 
-const HeroBg = ({ 
-      children, 
-      minRadius = 200,      // 默认最小圆半径
-      maxRadius = 400,      // 默认最大圆半径 
-      speedFactor = 1.8,    // 默认速度系数，提高为原来的1.8倍
-      colors = ['#836FFF', '#15F5BA', '#69F2FF']  // 默认颜色
+const HeroBg = ({
+      children,
+      minRadius = 200, // 默认最小圆半径
+      maxRadius = 400, // 默认最大圆半径
+      speedFactor = 1.8, // 默认速度系数，提高为原来的1.8倍
+      colors = ['#836FFF', '#15F5BA', '#69F2FF'], // 默认颜色
 }: HeroBgProps) => {
       const canvasRef = useRef<HTMLCanvasElement>(null);
       const circlesRef = useRef<circles[]>([]);
@@ -39,27 +39,30 @@ const HeroBg = ({
       }
 
       // 根据屏幕宽度计算圆形的合适半径
-      const calculateRadius = useCallback((screenWidth: number) => {
-            // 设置屏幕宽度范围
-            const minScreenWidth = 320;
-            const maxScreenWidth = 1920;
-            
-            // 限制屏幕宽度在范围内
-            const clampedWidth = Math.max(minScreenWidth, Math.min(screenWidth, maxScreenWidth));
-            
-            // 计算比例尺缩放系数
-            const scale = (clampedWidth - minScreenWidth) / (maxScreenWidth - minScreenWidth);
-            
-            // 在大屏幕上使用非线性缩放，让圆形在大屏幕上相对小一些
-            const nonLinearScale = Math.pow(scale, 1.5);
-            
-            // 计算半径，根据传入的最小和最大半径
-            return minRadius + nonLinearScale * (maxRadius - minRadius);
-      }, [minRadius, maxRadius]);
+      const calculateRadius = useCallback(
+            (screenWidth: number) => {
+                  // 设置屏幕宽度范围
+                  const minScreenWidth = 320;
+                  const maxScreenWidth = 1920;
+
+                  // 限制屏幕宽度在范围内
+                  const clampedWidth = Math.max(minScreenWidth, Math.min(screenWidth, maxScreenWidth));
+
+                  // 计算比例尺缩放系数
+                  const scale = (clampedWidth - minScreenWidth) / (maxScreenWidth - minScreenWidth);
+
+                  // 在大屏幕上使用非线性缩放，让圆形在大屏幕上相对小一些
+                  const nonLinearScale = Math.pow(scale, 1.5);
+
+                  // 计算半径，根据传入的最小和最大半径
+                  return minRadius + nonLinearScale * (maxRadius - minRadius);
+            },
+            [minRadius, maxRadius],
+      );
 
       const initCircles = useCallback(() => {
             if (!canvasRef.current) return;
-            
+
             const canvas = canvasRef.current;
             const ctx = canvas.getContext('2d');
             if (!ctx) return;
@@ -67,7 +70,7 @@ const HeroBg = ({
             circlesRef.current = [];
 
             const baseCount = Math.max(5, Math.min(20, Math.floor(window.innerWidth / 150)));
-            
+
             for (let i = 0; i < baseCount; i++) {
                   const baseRadius = calculateRadius(window.innerWidth);
                   const radius = randomBetween(baseRadius * 0.7, baseRadius * 1.3);
@@ -89,10 +92,10 @@ const HeroBg = ({
             if (!canvasRef.current) return;
             const ctx = canvasRef.current.getContext('2d');
             if (!ctx) return;
-            
+
             ctx.beginPath();
             ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2, false);
-            
+
             ctx.globalAlpha = 0.6;
             ctx.fillStyle = circle.color;
             ctx.fill();
@@ -104,7 +107,7 @@ const HeroBg = ({
             if (!canvasRef.current) return;
             const ctx = canvasRef.current.getContext('2d');
             if (!ctx) return;
-            
+
             ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
             circlesRef.current.forEach((circle) => {
@@ -126,7 +129,7 @@ const HeroBg = ({
 
       const resizeCanvas = useCallback(() => {
             if (!canvasRef.current) return;
-            
+
             const currentWidth = window.innerWidth;
             canvasRef.current.width = currentWidth * 1.2;
             canvasRef.current.height = window.innerHeight;
@@ -135,7 +138,7 @@ const HeroBg = ({
 
       useEffect(() => {
             if (!canvasRef.current) return;
-            
+
             resizeCanvas();
             initCircles();
             animate();
@@ -156,10 +159,10 @@ const HeroBg = ({
 
       return (
             <div className="h-screen min-h-[30em] flex justify-center items-center relative overflow-hidden before:content-[''] before:absolute before:inset-0 before:bg-[hsla(0,0%,41%,0.25)] before:backdrop-blur-[70px] before:top-0 before:left-0 before:w-full before:h-full before:z-[1] before:mix-blend-overlay">
-                  <canvas 
+                  <canvas
                         ref={canvasRef}
-                        id="hero-bg" 
-                        width={500} 
+                        id="hero-bg"
+                        width={500}
                         height={500}
                         className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 mix-blend-screen"
                   ></canvas>

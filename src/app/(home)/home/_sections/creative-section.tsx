@@ -9,6 +9,11 @@ import TextPressure from '@/components/anime/TextPressure/TextPressure';
 import Magnet from '@/components/anime/Magnet/Magnet';
 import GridDistortion from '@/components/anime/GridDistortion/GridDistortion';
 
+// 确保GSAP插件只注册一次
+if (typeof window !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+}
+
 // 技术栈图标
 const TechIcons = {
       vue: () => (
@@ -165,13 +170,20 @@ const CreativeSection = () => {
       const descriptionRef = useRef<HTMLDivElement>(null);
       const buttonRef = useRef<HTMLDivElement>(null);
       const techStackRef = useRef<HTMLDivElement>(null);
+      // 存储ScrollTrigger实例，用于清理
+      const scrollTriggers = useRef<ScrollTrigger[]>([]);
+      // 组件挂载状态标记
+      const isMounted = useRef(true);
 
       useEffect(() => {
-            gsap.registerPlugin(ScrollTrigger);
-
             // 容器入场动画
             if (containerRef.current) {
-                  gsap.fromTo(
+                  const containerTrigger = ScrollTrigger.create({
+                        trigger: containerRef.current,
+                        start: 'top 80%',
+                  });
+                  
+                  const containerAnim = gsap.fromTo(
                         containerRef.current,
                         { y: 50, opacity: 0 },
                         {
@@ -179,17 +191,22 @@ const CreativeSection = () => {
                               opacity: 1,
                               duration: 0.8,
                               ease: 'power2.out',
-                              scrollTrigger: {
-                                    trigger: containerRef.current,
-                                    start: 'top 80%',
-                              },
+                              scrollTrigger: containerTrigger,
                         },
                   );
+                  
+                  scrollTriggers.current.push(containerTrigger);
             }
 
             // 标题动画
             if (titleRef.current) {
-                  gsap.fromTo(
+                  const titleTrigger = ScrollTrigger.create({
+                        trigger: titleRef.current,
+                        start: 'top 85%',
+                        toggleActions: "play none none none", // 只执行一次
+                  });
+                  
+                  const titleAnim = gsap.fromTo(
                         titleRef.current,
                         { y: 50, opacity: 0 },
                         {
@@ -197,17 +214,22 @@ const CreativeSection = () => {
                               opacity: 1,
                               duration: 1,
                               ease: 'power3.out',
-                              scrollTrigger: {
-                                    trigger: titleRef.current,
-                                    start: 'top 85%',
-                              },
+                              scrollTrigger: titleTrigger,
                         },
                   );
+                  
+                  scrollTriggers.current.push(titleTrigger);
             }
 
             // 副标题动画
             if (subtitleRef.current) {
-                  gsap.fromTo(
+                  const subtitleTrigger = ScrollTrigger.create({
+                        trigger: subtitleRef.current,
+                        start: 'top 85%',
+                        toggleActions: "play none none none", // 只执行一次
+                  });
+                  
+                  const subtitleAnim = gsap.fromTo(
                         subtitleRef.current,
                         { y: 30, opacity: 0 },
                         {
@@ -216,18 +238,23 @@ const CreativeSection = () => {
                               duration: 0.8,
                               delay: 0.3,
                               ease: 'power2.out',
-                              scrollTrigger: {
-                                    trigger: subtitleRef.current,
-                                    start: 'top 85%',
-                              },
+                              scrollTrigger: subtitleTrigger,
                         },
                   );
+                  
+                  scrollTriggers.current.push(subtitleTrigger);
             }
 
             // 描述文字动画
             if (descriptionRef.current) {
                   const paragraphs = descriptionRef.current.querySelectorAll('p');
-                  gsap.fromTo(
+                  const descriptionTrigger = ScrollTrigger.create({
+                        trigger: descriptionRef.current,
+                        start: 'top 85%',
+                        toggleActions: "play none none none", // 只执行一次
+                  });
+                  
+                  const descriptionAnim = gsap.fromTo(
                         paragraphs,
                         { y: 30, opacity: 0 },
                         {
@@ -237,18 +264,23 @@ const CreativeSection = () => {
                               duration: 0.8,
                               delay: 0.5,
                               ease: 'power2.out',
-                              scrollTrigger: {
-                                    trigger: descriptionRef.current,
-                                    start: 'top 85%',
-                              },
+                              scrollTrigger: descriptionTrigger,
                         },
                   );
+                  
+                  scrollTriggers.current.push(descriptionTrigger);
             }
 
             // 技术栈动画
             if (techStackRef.current) {
                   const icons = techStackRef.current.querySelectorAll('.tech-icon');
-                  gsap.fromTo(
+                  const techTrigger = ScrollTrigger.create({
+                        trigger: techStackRef.current,
+                        start: 'top 85%',
+                        toggleActions: "play none none none", // 只执行一次
+                  });
+                  
+                  const techAnim = gsap.fromTo(
                         icons,
                         { y: 30, opacity: 0, scale: 0.8 },
                         {
@@ -259,17 +291,22 @@ const CreativeSection = () => {
                               duration: 0.6,
                               delay: 0.8,
                               ease: 'back.out(1.7)',
-                              scrollTrigger: {
-                                    trigger: techStackRef.current,
-                                    start: 'top 85%',
-                              },
+                              scrollTrigger: techTrigger,
                         },
                   );
+                  
+                  scrollTriggers.current.push(techTrigger);
             }
 
             // 按钮动画
             if (buttonRef.current) {
-                  gsap.fromTo(
+                  const buttonTrigger = ScrollTrigger.create({
+                        trigger: buttonRef.current,
+                        start: 'top 90%',
+                        toggleActions: "play none none none", // 只执行一次
+                  });
+                  
+                  const buttonAnim = gsap.fromTo(
                         buttonRef.current,
                         { opacity: 0, y: 10 },
                         {
@@ -278,16 +315,25 @@ const CreativeSection = () => {
                               duration: 0.6,
                               delay: 1.5,
                               ease: 'power2.out',
-                              scrollTrigger: {
-                                    trigger: buttonRef.current,
-                                    start: 'top 90%',
-                              },
+                              scrollTrigger: buttonTrigger,
                         },
                   );
+                  
+                  scrollTriggers.current.push(buttonTrigger);
             }
 
             return () => {
-                  ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+                  // 标记组件已卸载
+                  isMounted.current = false;
+                  
+                  // 正确清理所有ScrollTrigger实例
+                  scrollTriggers.current.forEach(trigger => {
+                        if (trigger) trigger.kill();
+                  });
+                  scrollTriggers.current = [];
+                  
+                  // 刷新其余的ScrollTrigger
+                  ScrollTrigger.refresh();
             };
       }, []);
 

@@ -16,17 +16,27 @@ export function HeroSection() {
   const containerRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const { theme } = useTheme()
+  // 添加跟踪GSAP动画的ref
+  const animations = useRef<gsap.core.Tween[]>([])
+  // 组件挂载状态标记
+  const isMounted = useRef(true)
 
   // 解决水合问题
   useEffect(() => {
     setMounted(true)
+    
+    return () => {
+      isMounted.current = false
+    }
   }, [])
 
   useEffect(() => {
     // 页面加载动画
     const timer = setTimeout(() => {
-      setIsLoaded(true)
-      if (DEBUG_MODE) console.log("英雄区域加载完成")
+      if (isMounted.current) {
+        setIsLoaded(true)
+        if (DEBUG_MODE) console.log("英雄区域加载完成")
+      }
     }, 500)
 
     const handleMouseMove = (e: MouseEvent) => {
@@ -69,17 +79,26 @@ export function HeroSection() {
 
       titleRef.current.appendChild(wrapper)
 
-      // 使用GSAP创建错开动画
-      gsap.to(wrapper.children, {
+      // 使用GSAP创建错开动画，保存动画实例
+      const titleAnim = gsap.to(wrapper.children, {
         opacity: 1,
         y: 0,
         stagger: 0.05,
         duration: 0.8,
         ease: "power3.out",
         onComplete: () => {
-          if (DEBUG_MODE) console.log("标题动画完成")
+          if (DEBUG_MODE && isMounted.current) console.log("标题动画完成")
         }
       })
+      
+      // 添加到动画列表以便清理
+      animations.current.push(titleAnim)
+    }
+    
+    return () => {
+      // 清理所有动画
+      animations.current.forEach(anim => anim.kill())
+      animations.current = []
     }
   }, [isLoaded])
 

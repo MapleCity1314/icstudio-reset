@@ -12,7 +12,10 @@ import Image from 'next/image';
 import Magnet from '@/components/anime/Magnet/Magnet';
 import { motion } from 'framer-motion';
 
-gsap.registerPlugin(ScrollTrigger);
+// 确保GSAP插件只注册一次
+if (typeof window !== 'undefined') {
+      gsap.registerPlugin(ScrollTrigger);
+}
 
 // 几何形状组件
 interface GeometricShapeProps {
@@ -110,11 +113,11 @@ const projects = [
       },
       {
             title: 'Loome:织',
-            description: '多平台强大的多AI多模态视频编辑器',
+            description: '多平台强大的多AI多模态视频编辑器，目前处于研发中',
             imageUrl: '/placeholder.svg?height=300&width=400',
             color: 'from-orange-500 to-yellow-500',
             state: '研发中',
-            tags: ['Electron', 'React', 'AI'],
+            tags: ['Tauri', 'React', 'AI'],
             projectLink: 'https://example.com/project6',
             githubLink: 'https://github.com/example/project6',
       }
@@ -308,33 +311,57 @@ export function ProjectsSection() {
       const projectsRef = useRef<HTMLDivElement>(null);
       const titleRef = useRef<HTMLHeadingElement>(null);
       // const demoRef = useRef<HTMLDivElement>(null);
+      
+      // 存储ScrollTrigger实例，用于清理
+      const scrollTriggers = useRef<ScrollTrigger[]>([]);
+      // 组件挂载状态标记
+      const isMounted = useRef(true);
 
       // 解决水合问题
       useEffect(() => {
             setMounted(true);
+            
+            return () => {
+                  isMounted.current = false;
+            };
       }, []);
 
       useEffect(() => {
             if (!mounted) return;
 
             // 标题动画
-            gsap.fromTo(
-                  titleRef.current,
-                  { y: -50, opacity: 0 },
-                  {
-                        y: 0,
-                        opacity: 1,
-                        duration: 1.2,
-                        ease: 'power3.out',
-                        scrollTrigger: {
-                              trigger: titleRef.current,
-                              start: 'top 80%',
-                        },
-                  }
-            );
+            if (titleRef.current) {
+                  const titleTrigger = ScrollTrigger.create({
+                        trigger: titleRef.current,
+                        start: 'top 80%',
+                        toggleActions: "play none none none", // 只执行一次
+                  });
+                  
+                  const titleAnim = gsap.fromTo(
+                        titleRef.current,
+                        { y: -50, opacity: 0 },
+                        {
+                              y: 0,
+                              opacity: 1,
+                              duration: 1.2,
+                              ease: 'power3.out',
+                              scrollTrigger: titleTrigger,
+                        }
+                  );
+                  
+                  // 添加到实例列表用于清理
+                  scrollTriggers.current.push(titleTrigger);
+            }
 
             return () => {
-                  ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
+                  // 清理所有ScrollTrigger实例
+                  scrollTriggers.current.forEach((trigger) => {
+                        if (trigger) trigger.kill();
+                  });
+                  scrollTriggers.current = [];
+                  
+                  // 刷新其余的ScrollTrigger
+                  ScrollTrigger.refresh();
             };
       }, [mounted]);
 
