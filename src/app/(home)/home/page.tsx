@@ -2,7 +2,6 @@
 
 import { useEffect } from "react"
 import CreativeSection from "./_sections/creative-section";
-import { Footer } from "./_components/footer";
 import { HeroSection } from "./_sections/hero-section";
 import { CurvedNavigation } from "./_components/navigation";
 import { ProjectsSection } from "./_sections/projects-section";
@@ -10,6 +9,7 @@ import { NewsSection } from "./_sections/news-section";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import gsap from "gsap";
 import ContactSection from "./_sections/contact-section";
+import { useTheme } from "next-themes";
 
 // 确保GSAP插件只注册一次
 if (typeof window !== 'undefined') {
@@ -17,6 +17,8 @@ if (typeof window !== 'undefined') {
 }
 
 const Page = () => {
+
+      const { setTheme } = useTheme()
       // 设置滚动平滑并刷新ScrollTrigger
       useEffect(() => {
             // 优化滚动性能
@@ -43,6 +45,10 @@ const Page = () => {
                   }
             }
       }, [])
+
+      useEffect(() => {
+            setTheme("dark")
+      }, [])
       
       return (
             <main className="relative">
@@ -52,13 +58,7 @@ const Page = () => {
                   <ProjectsSection />
                   <NewsSection />
                   {/* 添加其他部分的占位符，以便导航可以正常工作 */}
-                  
-
                   <ContactSection />
-
-                  <section id="footer" className="bg-background">
-                        <Footer />
-                  </section>
             </main>
       );
 };
