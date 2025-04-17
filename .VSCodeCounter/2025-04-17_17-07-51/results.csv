@@ -1,0 +1,68 @@
+"filename", "language", "Markdown", "JSON with Comments", "TypeScript", "JavaScript", "JSON", "YAML", "XML", "TypeScript JSX", "CSS", "HTML", "comment", "blank", "total"
+"e:\Projects\Nextjs-projects\icstudio-reset\.prettierrc", "JSON", 0, 0, 0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 8
+"e:\Projects\Nextjs-projects\icstudio-reset\README.md", "Markdown", 23, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 14, 37
+"e:\Projects\Nextjs-projects\icstudio-reset\components.json", "JSON", 0, 0, 0, 0, 21, 0, 0, 0, 0, 0, 0, 0, 21
+"e:\Projects\Nextjs-projects\icstudio-reset\eslint.config.mjs", "JavaScript", 0, 0, 0, 12, 0, 0, 0, 0, 0, 0, 0, 5, 17
+"e:\Projects\Nextjs-projects\icstudio-reset\next.config.ts", "TypeScript", 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 1, 4, 9
+"e:\Projects\Nextjs-projects\icstudio-reset\package-lock.json", "JSON", 0, 0, 0, 0, 5802, 0, 0, 0, 0, 0, 0, 1, 5803
+"e:\Projects\Nextjs-projects\icstudio-reset\package.json", "JSON", 0, 0, 0, 0, 49, 0, 0, 0, 0, 0, 0, 1, 50
+"e:\Projects\Nextjs-projects\icstudio-reset\pnpm-lock.yaml", "YAML", 0, 0, 0, 0, 0, 4213, 0, 0, 0, 0, 0, 1054, 5267
+"e:\Projects\Nextjs-projects\icstudio-reset\postcss.config.mjs", "JavaScript", 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 2, 6
+"e:\Projects\Nextjs-projects\icstudio-reset\public\file.svg", "XML", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1
+"e:\Projects\Nextjs-projects\icstudio-reset\public\globe.svg", "XML", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1
+"e:\Projects\Nextjs-projects\icstudio-reset\public\logo\logo-django.42234b631760.svg", "XML", 0, 0, 0, 0, 0, 0, 11, 0, 0, 0, 0, 0, 11
+"e:\Projects\Nextjs-projects\icstudio-reset\public\logo\logo-t.svg", "XML", 0, 0, 0, 0, 0, 0, 536, 0, 0, 0, 0, 1, 537
+"e:\Projects\Nextjs-projects\icstudio-reset\public\logo\moon-b.svg", "XML", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1
+"e:\Projects\Nextjs-projects\icstudio-reset\public\logo\moon-w.svg", "XML", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1
+"e:\Projects\Nextjs-projects\icstudio-reset\public\loome.html", "HTML", 0, 0, 0, 0, 0, 0, 0, 0, 0, 234, 2, 2, 238
+"e:\Projects\Nextjs-projects\icstudio-reset\public\next.svg", "XML", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1
+"e:\Projects\Nextjs-projects\icstudio-reset\public\vercel.svg", "XML", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1
+"e:\Projects\Nextjs-projects\icstudio-reset\public\window.svg", "XML", 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(error)\404\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 0, 3, 15
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(error)\error\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 132, 0, 0, 5, 14, 151
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\contact\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 13, 0, 0, 0, 4, 17
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\contact\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 394, 0, 0, 74, 57, 525
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\home\_components\footer.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 363, 0, 0, 18, 28, 409
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\home\_components\nav.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 256, 0, 0, 25, 33, 314
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\home\_components\navigation.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 184, 0, 0, 21, 33, 238
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\home\_components\news-heading.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 16, 0, 0, 0, 3, 19
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\home\_components\news-item-skeleton.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 22, 0, 0, 4, 5, 31
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\home\_sections\contact-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 121, 0, 0, 12, 22, 155
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\home\_sections\creative-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 392, 0, 0, 27, 34, 453
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\home\_sections\hero-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 232, 0, 0, 38, 42, 312
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\home\_sections\news-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 261, 0, 0, 41, 42, 344
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\home\_sections\projects-section.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 396, 0, 0, 34, 39, 469
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\home\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 2, 17
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\home\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 47, 0, 0, 8, 12, 67
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\(home)\resource\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 10, 0, 0, 0, 2, 12
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\fonts.ts", "TypeScript", 0, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 1, 7
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\globals.css", "CSS", 0, 0, 0, 0, 0, 0, 0, 0, 126, 0, 0, 5, 131
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\layout.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 35, 0, 0, 0, 5, 40
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\news\2025-04-17-Loome-Result.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 354, 0, 0, 14, 21, 389
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\news\2025-04-17-Loome-Result\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 12, 0, 0, 1, 3, 16
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\news\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 24, 0, 0, 0, 2, 26
+"e:\Projects\Nextjs-projects\icstudio-reset\src\app\page.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 95, 0, 0, 5, 9, 109
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\anime\FuzzyText\FuzzyText.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 161, 0, 0, 5, 34, 200
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\anime\GridDistortion\GridDistortion.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 179, 0, 0, 5, 31, 215
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\anime\Magnet\Magnet.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 75, 0, 0, 3, 13, 91
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\anime\RotatingText\RotatingText.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 230, 0, 0, 3, 18, 251
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\anime\ScrollFloat\ScrollFloat.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 78, 0, 0, 3, 11, 92
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\anime\TextPressure\TextPressure.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 185, 0, 0, 3, 32, 220
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\bg\hero-bg.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 141, 0, 0, 14, 40, 195
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\bg\starry-background.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 78, 0, 0, 10, 21, 109
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\logo\nav-logo.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 36, 9, 97
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\magicui\orbiting-circles.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 69, 0, 0, 0, 3, 72
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\theme-provider.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 14, 0, 0, 1, 4, 19
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\theme-toggle.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 26, 0, 0, 1, 6, 33
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\ui\alert.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 60, 0, 0, 0, 7, 67
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\ui\button.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 54, 0, 0, 0, 6, 60
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\ui\card.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 83, 0, 0, 0, 10, 93
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\ui\dropdown-menu.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 181, 0, 0, 0, 17, 198
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\ui\input.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 18, 0, 0, 0, 4, 22
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\ui\textarea.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 15, 0, 0, 0, 4, 19
+"e:\Projects\Nextjs-projects\icstudio-reset\src\components\ui\wavy-background.tsx", "TypeScript JSX", 0, 0, 0, 0, 0, 0, 0, 124, 0, 0, 5, 8, 137
+"e:\Projects\Nextjs-projects\icstudio-reset\src\lib\utils.ts", "TypeScript", 0, 0, 5, 0, 0, 0, 0, 0, 0, 0, 0, 2, 7
+"e:\Projects\Nextjs-projects\icstudio-reset\src\store\theme-store.ts", "TypeScript", 0, 0, 126, 0, 0, 0, 0, 0, 0, 0, 18, 19, 163
+"e:\Projects\Nextjs-projects\icstudio-reset\tailwind.config.ts", "TypeScript", 0, 0, 73, 0, 0, 0, 0, 0, 0, 0, 0, 3, 76
+"e:\Projects\Nextjs-projects\icstudio-reset\tsconfig.json", "JSON with Comments", 0, 28, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 29
+"Total", "-", 23, 28, 214, 16, 5880, 4213, 554, 5209, 126, 234, 437, 1808, 18742

@@ -38,130 +38,137 @@ export function Footer() {
   const [email, setEmail] = useState("")
   const [message, setMessage] = useState("")
   const [mounted, setMounted] = useState(false)
+  const [animationsInitialized, setAnimationsInitialized] = useState(false)
   
+  // DOM引用
+  const footerRef = useRef<HTMLElement>(null)
   const formContainerRef = useRef<HTMLDivElement>(null)
   const formTitleRef = useRef<HTMLHeadingElement>(null)
   const formInputsRef = useRef<HTMLDivElement>(null)
   const formBtnRef = useRef<HTMLButtonElement>(null)
   const footerSectionsRef = useRef<HTMLDivElement>(null)
   
+  // 动画实例跟踪
+  const animations = useRef<gsap.core.Tween[]>([])
+  const scrollTriggers = useRef<ScrollTrigger[]>([])
+
+  // 清理动画的辅助函数
+  const cleanupAnimations = () => {
+    // 清理动画实例
+    if (animations.current.length > 0) {
+      animations.current.forEach(anim => anim && anim.kill())
+      animations.current = []
+    }
+    
+    // 清理ScrollTrigger实例
+    if (scrollTriggers.current.length > 0) {
+      scrollTriggers.current.forEach(trigger => trigger.kill())
+      scrollTriggers.current = []
+    }
+  }
+  
+  // 检查元素可见性
+  const isElementInViewport = (el: HTMLElement) => {
+    const rect = el.getBoundingClientRect()
+    return (
+      rect.top <= (window.innerHeight || document.documentElement.clientHeight) &&
+      rect.bottom >= 0
+    )
+  }
+  
+  // 组件挂载后初始化
   useEffect(() => {
     setMounted(true)
     
     if (typeof window !== "undefined") {
       gsap.registerPlugin(ScrollTrigger)
     }
+    
+    // 组件卸载时清理
+    return () => {
+      cleanupAnimations()
+    }
   }, [])
   
-  // 添加GSAP动画
+  // 监听滚动以手动触发动画
   useEffect(() => {
-    if (!mounted) return
+    if (!mounted || animationsInitialized) return
     
-    // 表单动画
+    const checkVisibility = () => {
+      if (footerRef.current && isElementInViewport(footerRef.current)) {
+        initializeAnimations()
+        setAnimationsInitialized(true)
+        
+        // 一旦初始化，移除滚动监听器
+        window.removeEventListener('scroll', checkVisibility)
+      }
+    }
+    
+    // 添加滚动监听器
+    window.addEventListener('scroll', checkVisibility)
+    
+    // 立即检查一次可见性
+    checkVisibility()
+    
+    return () => {
+      window.removeEventListener('scroll', checkVisibility)
+    }
+  }, [mounted, animationsInitialized])
+  
+  // 初始化动画
+  const initializeAnimations = () => {
+    // 确保先清理之前的动画
+    cleanupAnimations()
+    
+    // 仅在DOM元素存在时创建动画
     if (formContainerRef.current && formTitleRef.current && formInputsRef.current && formBtnRef.current) {
       // 表单容器动画
-      gsap.fromTo(
+      const formContainerAnim = gsap.fromTo(
         formContainerRef.current,
-        { 
-          opacity: 0,
-          x: 50
-        },
-        { 
-          opacity: 1,
-          x: 0,
-          duration: 0.8,
-          scrollTrigger: {
-            trigger: formContainerRef.current,
-            start: "top 80%"
-          }
-        }
+        { opacity: 0, x: 50 },
+        { opacity: 1, x: 0, duration: 0.8 }
       )
+      animations.current.push(formContainerAnim)
       
       // 表单标题动画
-      gsap.fromTo(
+      const formTitleAnim = gsap.fromTo(
         formTitleRef.current,
-        { 
-          opacity: 0,
-          y: -20
-        },
-        { 
-          opacity: 1,
-          y: 0,
-          duration: 0.6,
-          delay: 0.2,
-          scrollTrigger: {
-            trigger: formContainerRef.current,
-            start: "top 80%"
-          }
-        }
+        { opacity: 0, y: -20 },
+        { opacity: 1, y: 0, duration: 0.6, delay: 0.2 }
       )
+      animations.current.push(formTitleAnim)
       
       // 表单输入框动画
-      gsap.fromTo(
-        formInputsRef.current.children,
-        { 
-          opacity: 0,
-          y: 20
-        },
-        { 
-          opacity: 1,
-          y: 0,
-          duration: 0.4,
-          stagger: 0.1,
-          delay: 0.4,
-          scrollTrigger: {
-            trigger: formContainerRef.current,
-            start: "top 80%"
-          }
-        }
-      )
+      if (formInputsRef.current.children.length > 0) {
+        const formInputsAnim = gsap.fromTo(
+          formInputsRef.current.children,
+          { opacity: 0, y: 20 },
+          { opacity: 1, y: 0, duration: 0.4, stagger: 0.1, delay: 0.4 }
+        )
+        animations.current.push(formInputsAnim)
+      }
       
       // 按钮动画
-      gsap.fromTo(
+      const formBtnAnim = gsap.fromTo(
         formBtnRef.current,
-        { 
-          opacity: 0,
-          scale: 0.9
-        },
-        { 
-          opacity: 1,
-          scale: 1,
-          duration: 0.6,
-          delay: 0.8,
-          scrollTrigger: {
-            trigger: formContainerRef.current,
-            start: "top 80%"
-          }
-        }
+        { opacity: 0, scale: 0.9 },
+        { opacity: 1, scale: 1, duration: 0.6, delay: 0.8 }
       )
+      animations.current.push(formBtnAnim)
     }
     
     // 页脚各部分动画
-    if (footerSectionsRef.current) {
-      gsap.fromTo(
+    if (footerSectionsRef.current && footerSectionsRef.current.children.length > 0) {
+      const footerSectionsAnim = gsap.fromTo(
         footerSectionsRef.current.children,
-        { 
-          opacity: 0,
-          y: 30
-        },
-        { 
-          opacity: 1,
-          y: 0,
-          duration: 0.8,
-          stagger: 0.15,
-          scrollTrigger: {
-            trigger: footerSectionsRef.current,
-            start: "top 85%"
-          }
-        }
+        { opacity: 0, y: 30 },
+        { opacity: 1, y: 0, duration: 0.8, stagger: 0.15 }
       )
+      animations.current.push(footerSectionsAnim)
     }
-    
-    return () => {
-      ScrollTrigger.getAll().forEach(trigger => trigger.kill())
-    }
-  }, [mounted])
+  }
 
+  // 处理订阅表单提交
   const handleSubmitNewsletter = (e: React.FormEvent) => {
     e.preventDefault()
     console.log("Newsletter subscription:", email)
@@ -169,6 +176,7 @@ export function Footer() {
     alert("感谢订阅我们的通讯！")
   }
 
+  // 处理留言表单提交
   const handleSubmitMessage = (e: React.FormEvent) => {
     e.preventDefault()
     console.log("Message submitted:", message)
@@ -188,13 +196,13 @@ export function Footer() {
   }
 
   return (
-    <footer id="footer" className="relative bg-white text-black pt-20">
+    <footer ref={footerRef} id="footer" className="relative bg-white text-black pt-20">
       {/* 主要页脚部分 - 白色背景，不受主题控制 */}
       <div className="bg-white text-black py-16 px-4 md:px-8 lg:px-16">
         <div className="container mx-auto">
           <div ref={footerSectionsRef} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-12 gap-8 mb-16">
             {/* 办公室地址 */}
-            <div className="lg:col-span-3">
+            <div className="lg:col-span-3" style={{ opacity: animationsInitialized ? 1 : 0 }}>
               <h3 className="text-xs uppercase tracking-wider mb-8 text-gray-400">OFFICES</h3>
               <div className="space-y-6">
                 <div>
@@ -211,7 +219,7 @@ export function Footer() {
             </div>
 
             {/* 资源 */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2" style={{ opacity: animationsInitialized ? 1 : 0 }}>
               <h3 className="text-xs uppercase tracking-wider mb-8 text-gray-400">资源</h3>
               <div className="space-y-3">
                 <div>
@@ -243,7 +251,7 @@ export function Footer() {
             </div>
 
             {/* 更多 (与nav相同的内容) */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2" style={{ opacity: animationsInitialized ? 1 : 0 }}>
               <h3 className="text-xs uppercase tracking-wider mb-8 text-gray-400">更多</h3>
               <div className="space-y-3">
                 {footerNavItems.map((item, index) => (
@@ -257,7 +265,7 @@ export function Footer() {
             </div>
 
             {/* 关于我们 */}
-            <div className="lg:col-span-2">
+            <div className="lg:col-span-2" style={{ opacity: animationsInitialized ? 1 : 0 }}>
               <h3 className="text-xs uppercase tracking-wider mb-8 text-gray-400">关于我们</h3>
               <div className="space-y-3">
                 <div>
@@ -294,14 +302,21 @@ export function Footer() {
             </div>
 
             {/* 联系表单 - 嵌入到关于我们右侧 */}
-            <div ref={formContainerRef} className="lg:col-span-3 relative">
+            <div 
+              ref={formContainerRef} 
+              className="lg:col-span-3 relative"
+              style={{ opacity: animationsInitialized ? 1 : 0, transform: 'translateX(0)' }}
+            >
               <div className="bg-white shadow-xl rounded-xl p-6 border border-gray-100">
-                <h3 ref={formTitleRef} className="text-xl font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500">
+                <h3 
+                  ref={formTitleRef} 
+                  className="text-xl font-medium mb-6 bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-purple-500"
+                >
                   留言箱
                 </h3>
                 <form onSubmit={handleSubmitMessage}>
                   <div ref={formInputsRef} className="space-y-4">
-                    <div>
+                    <div style={{ opacity: animationsInitialized ? 1 : 0 }}>
                       <Input 
                         type="email" 
                         placeholder="您的邮箱" 
@@ -309,7 +324,7 @@ export function Footer() {
                         required 
                       />
                     </div>
-                    <div>
+                    <div style={{ opacity: animationsInitialized ? 1 : 0 }}>
                       <Textarea
                         placeholder="请输入您的留言..."
                         className="bg-gray-50 border-gray-200 dark:bg-gray-50 dark:border-gray-200 dark:text-black min-h-[120px] focus-ring-blue-500"
@@ -322,6 +337,7 @@ export function Footer() {
                       ref={formBtnRef}
                       type="submit" 
                       className="w-full bg-gradient-to-r from-blue-500 to-violet-500 text-white hover:from-blue-600 hover:to-violet-600 transition-all"
+                      style={{ opacity: animationsInitialized ? 1 : 0 }}
                     >
                       发送留言 <Send className="ml-2 h-4 w-4" />
                     </Button>
@@ -331,7 +347,7 @@ export function Footer() {
             </div>
 
             {/* 联系我们 */}
-            <div className="lg:col-span-12 mt-8">
+            <div className="lg:col-span-12 mt-8" style={{ opacity: animationsInitialized ? 1 : 0 }}>
               <div className="border-t border-gray-200 pt-8">
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center">
                   <div className="flex items-center mb-4 md:mb-0">

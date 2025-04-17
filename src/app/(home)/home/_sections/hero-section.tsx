@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react"
 import { useTheme } from "next-themes"
+import { usePathname } from "next/navigation"
 import gsap from "gsap"
 import { beatriceDisplay } from "@/app/fonts"
 import HeroBg from "@/components/bg/hero-bg"
@@ -10,90 +11,171 @@ import HeroBg from "@/components/bg/hero-bg"
 const DEBUG_MODE = false
 
 export function HeroSection() {
+  // 状态管理
   const [isLoaded, setIsLoaded] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [animationReady, setAnimationReady] = useState(false)
+  const firstLoad = useRef(true)
+  
+  // DOM引用
   const containerRef = useRef<HTMLDivElement>(null)
   const titleRef = useRef<HTMLHeadingElement>(null)
   const leftTextRef = useRef<HTMLDivElement>(null)
   const rightTextRef = useRef<HTMLDivElement>(null)
+  
+  // 主题和路由
   const { theme } = useTheme()
-  // 添加跟踪GSAP动画的ref
+  const pathname = usePathname()
+  
+  // 动画实例跟踪
   const animations = useRef<gsap.core.Tween[]>([])
+  const titleWrapperRef = useRef<HTMLDivElement | null>(null)
+  
   // 组件挂载状态标记
   const isMounted = useRef(true)
 
+  // 添加强制重绘和初始化函数
+  const forceRepaint = () => {
+    if (containerRef.current) {
+      const height = containerRef.current.offsetHeight;
+      return height; // 返回值不重要，只是为了强制浏览器重绘
+    }
+    return 0;
+  };
+
   // 解决水合问题
   useEffect(() => {
-    setMounted(true)
+    setMounted(true);
+    
+    // 组件加载后强制重绘一次
+    forceRepaint();
+    
+    // 设置一个短延迟后标记为已加载
+    const timer = setTimeout(() => {
+      setIsLoaded(true);
+      setAnimationReady(true);
+      if (DEBUG_MODE) console.log("初始组件挂载设置");
+    }, 10);
     
     return () => {
-      isMounted.current = false
-    }
-  }, [])
+      isMounted.current = false;
+      clearTimeout(timer);
+      // 清理所有动画
+      animations.current.forEach(anim => anim && anim.kill());
+      animations.current = [];
+    };
+  }, []);
 
+  // 路由变化时重置动画状态
   useEffect(() => {
-    // 页面加载动画
-    const timer = setTimeout(() => {
-      if (isMounted.current) {
-        setIsLoaded(true)
-        if (DEBUG_MODE) console.log("英雄区域加载完成")
-      }
-    }, 500)
-
-    return () => {
-      clearTimeout(timer)
+    if (!firstLoad.current) {
+      // 清理所有现有动画
+      cleanupAnimations();
+      
+      // 标记为未加载状态，触发CSS过渡动画
+      setIsLoaded(false);
+      
+      // 强制一次重绘
+      forceRepaint();
+      
+      // 确保DOM有足够时间重置
+      const timer = setTimeout(() => {
+        if (isMounted.current) {
+          setIsLoaded(true);
+          setAnimationReady(prev => !prev); // 切换状态触发重新执行动画
+          if (DEBUG_MODE) console.log("路由变化重设动画 - 路由:", pathname);
+        }
+      }, 50);
+      
+      return () => clearTimeout(timer);
+    } else {
+      firstLoad.current = false;
     }
-  }, [])
+  }, [pathname]);
+
+  // 清理所有动画的辅助函数
+  const cleanupAnimations = () => {
+    animations.current.forEach(anim => anim && anim.kill());
+    animations.current = [];
+    
+    // 重置标题内容
+    if (titleRef.current) {
+      titleRef.current.innerHTML = "Infinity Creators";
+      titleWrapperRef.current = null;
+    }
+    
+    // 重置左右文本样式
+    if (leftTextRef.current) {
+      gsap.set(leftTextRef.current, { clearProps: "all" });
+    }
+    
+    if (rightTextRef.current) {
+      gsap.set(rightTextRef.current, { clearProps: "all" });
+    }
+  };
 
   // 文字错开动画
   useEffect(() => {
-    if (isLoaded && titleRef.current) {
+    if (!isLoaded || !animationReady) return;
+    
+    if (titleRef.current && isMounted.current) {
+      // 确保标题内容已重置
+      if (titleWrapperRef.current) {
+        cleanupAnimations();
+      }
+      
       // 将标题文本分割成单个字符
-      const text = "Infinity Creators"
-      titleRef.current.innerHTML = ""
+      const text = "Infinity Creators";
+      titleRef.current.innerHTML = "";
 
       // 创建包装器
-      const wrapper = document.createElement("div")
-      wrapper.className = "flex flex-wrap justify-center"
+      const wrapper = document.createElement("div");
+      wrapper.className = "flex flex-wrap justify-center";
+      titleWrapperRef.current = wrapper;
 
       // 为每个字符创建span
       text.split("").forEach((char) => {
-        const span = document.createElement("span")
-        span.textContent = char === " " ? "\u00A0" : char
-        span.className = "inline-block"
-        span.style.opacity = "0"
-        span.style.transform = "translateY(20px)"
-        wrapper.appendChild(span)
-      })
+        const span = document.createElement("span");
+        span.textContent = char === " " ? "\u00A0" : char;
+        span.className = "inline-block";
+        span.style.opacity = "0";
+        span.style.transform = "translateY(20px)";
+        wrapper.appendChild(span);
+      });
 
-      titleRef.current.appendChild(wrapper)
+      titleRef.current.appendChild(wrapper);
 
-      // 使用GSAP创建错开动画，保存动画实例
+      // 强制重绘确保DOM更新
+      forceRepaint();
+
+      // 使用GSAP创建错开动画
       const titleAnim = gsap.to(wrapper.children, {
         opacity: 1,
         y: 0,
         stagger: 0.05,
         duration: 0.8,
         ease: "power3.out",
+        onStart: () => {
+          if (DEBUG_MODE) console.log("标题动画开始");
+        },
         onComplete: () => {
-          if (DEBUG_MODE && isMounted.current) console.log("标题动画完成")
+          if (DEBUG_MODE && isMounted.current) console.log("标题动画完成");
         }
-      })
+      });
       
       // 添加到动画列表以便清理
-      animations.current.push(titleAnim)
+      animations.current.push(titleAnim);
     }
-    
-    return () => {
-      // 清理所有动画
-      animations.current.forEach(anim => anim.kill())
-      animations.current = []
-    }
-  }, [isLoaded])
+  }, [isLoaded, animationReady]);
 
-  // 添加自动浮动动画替代鼠标跟踪
+  // 添加自动浮动动画
   useEffect(() => {
-    if (isLoaded && leftTextRef.current && rightTextRef.current) {
+    if (!isLoaded || !animationReady) return;
+    
+    if (leftTextRef.current && rightTextRef.current && isMounted.current) {
+      // 确保左右文本是可见的
+      gsap.set([leftTextRef.current, rightTextRef.current], { opacity: 1 });
+      
       // 左侧文本自动浮动
       const leftAnim = gsap.to(leftTextRef.current, {
         x: -15,
@@ -102,7 +184,7 @@ export function HeroSection() {
         ease: "sine.inOut",
         repeat: -1,
         yoyo: true,
-      })
+      });
       
       // 右侧文本自动浮动（错开时间）
       const rightAnim = gsap.to(rightTextRef.current, {
@@ -113,21 +195,23 @@ export function HeroSection() {
         repeat: -1,
         yoyo: true,
         delay: 0.5, // 错开动画时间
-      })
+      });
       
       // 添加到动画列表以便清理
-      animations.current.push(leftAnim, rightAnim)
+      animations.current.push(leftAnim, rightAnim);
+      
+      // Debug日志
+      if (DEBUG_MODE) {
+        console.log("浮动动画已添加", {
+          leftElement: !!leftTextRef.current,
+          rightElement: !!rightTextRef.current
+        });
+      }
     }
-    
-    return () => {
-      // 清理动画
-      animations.current.forEach(anim => anim.kill())
-      animations.current = []
-    }
-  }, [isLoaded])
+  }, [isLoaded, animationReady]);
 
   // 如果组件未挂载，返回空内容
-  if (!mounted) return null
+  if (!mounted) return null;
 
   return (
     <HeroBg
@@ -144,12 +228,12 @@ export function HeroSection() {
         {/* 左侧文本 - 左上方位置 */}
         <div
           ref={leftTextRef}
-          className={`absolute left-1/4 -translate-x-1/2 top-1/3 -translate-y-1/2 
-            transition-all duration-300 ease-out 
-            ${isLoaded ? "opacity-100" : "opacity-0 translate-y-[-10px] translate-x-[-10px]"}
-          `}
+          className="absolute left-1/4 -translate-x-1/2 top-1/3 -translate-y-1/2 transition-all duration-300 ease-out"
           style={{
             transitionDelay: "200ms",
+            opacity: isLoaded ? 1 : 0,
+            transform: `translate(-50%, -50%) translate(${isLoaded ? '0px' : '-10px'}, ${isLoaded ? '0px' : '-10px'})`,
+            display: 'block'
           }}
         >
           <p
@@ -164,7 +248,12 @@ export function HeroSection() {
 
         {/* 中央标题 */}
         <div
-          className={`transition-all duration-700 ease-out px-4 ${isLoaded ? "opacity-100 scale-100" : "opacity-0 scale-95"}`}
+          className="transition-all duration-700 ease-out px-4"
+          style={{ 
+            opacity: isLoaded ? 1 : 0, 
+            transform: `scale(${isLoaded ? 1 : 0.95})`,
+            display: 'block'
+          }}
         >
           <h1
             ref={titleRef}
@@ -179,12 +268,12 @@ export function HeroSection() {
         {/* 右侧文本 - 右下方位置 */}
         <div
           ref={rightTextRef}
-          className={`absolute right-1/4 translate-x-1/2 bottom-1/3 translate-y-1/2
-            transition-all duration-300 ease-out
-            ${isLoaded ? "opacity-100" : "opacity-0 translate-y-[10px] translate-x-[10px]"}
-          `}
+          className="absolute right-1/4 translate-x-1/2 bottom-1/3 translate-y-1/2 transition-all duration-300 ease-out"
           style={{
             transitionDelay: "200ms",
+            opacity: isLoaded ? 1 : 0,
+            transform: `translate(50%, 50%) translate(${isLoaded ? '0px' : '10px'}, ${isLoaded ? '0px' : '10px'})`,
+            display: 'block'
           }}
         >
           <p
