@@ -1,5 +1,4 @@
 import { ReactNode } from "react"
-import HomeNav from "./_components/nav"
 
 const HomeLayout = ({
         children
@@ -8,7 +7,6 @@ const HomeLayout = ({
 }) => {
         return (
                 <div>
-                        <HomeNav />
                         { children }
                 </div>
         )

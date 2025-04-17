@@ -269,7 +269,7 @@ export function Footer() {
               <h3 className="text-xs uppercase tracking-wider mb-8 text-gray-400">关于我们</h3>
               <div className="space-y-3">
                 <div>
-                  <a href="https://example.com/judgerduck" className="text-sm text-gray-600 hover:underline flex items-center">
+                  <a href="/404" className="text-sm text-gray-600 hover:underline flex items-center">
                     判题鸭
                     <ExternalLink className="ml-1 h-3 w-3" />
                   </a>
@@ -368,7 +368,7 @@ export function Footer() {
                         />
                         <Button
                           type="submit"
-                          className="absolute right-0 top-1/2 -translate-y-1/2 text-black"
+                          className="absolute right-0 top-1/2 -translate-y-1/2 text-black bg-transparent"
                           aria-label="订阅"
                         >
                           <ArrowRight className="h-5 w-5" />

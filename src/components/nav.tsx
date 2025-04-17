@@ -32,7 +32,7 @@ const HomeNav = () => {
   // Navigation items
   const navItems: NavItem[] = [
     { label: "首页", href: "/" },
-    { label: "资源", href: "/resources" },
+    { label: "资源", href: "/resource" },
     { label: "我们做什么", href: "/what-we-do" },
     { label: "关于我们", href: "/who-we-are" },
     { label: "新闻", href: "/news" },

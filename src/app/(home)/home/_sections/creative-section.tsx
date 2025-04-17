@@ -364,7 +364,7 @@ const CreativeSection = () => {
                                     {/* 副标题 */}
                                     <p
                                           ref={subtitleRef}
-                                          className="text-xl md:text-2xl font-medium text-gray-300 italic"
+                                          className="text-xl md:text-2xl font-medium text-gray-300 italic font-family-[--font-beatrice-display]"
                                     >
                                           Be Young, Be Creative, Be Bold
                                     </p>
