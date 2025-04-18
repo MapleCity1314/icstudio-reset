@@ -1,5 +1,5 @@
 {
-  "name": "icstudio-reset",
+  "name": "icstudio",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -27,7 +27,6 @@
     "ogl": "^1.0.11",
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
-    "recharts": "^2.15.2",
     "simplex-noise": "^4.0.3",
     "tailwind-merge": "^3.2.0",
     "three": "0.167.1",

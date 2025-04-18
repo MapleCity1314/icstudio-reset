@@ -33,13 +33,13 @@ const fadeInVariants: Variants = {
   }
 }
 
-// 背景动画变体
-const bgVariants: Variants = {
+// 内容元素动画变体
+const contentVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { 
     opacity: 1,
     transition: { 
-      duration: 0.8, // 增加延迟，确保组件完全重置
+      duration: 0.8,
       ease: "easeOut"
     }
   }
@@ -142,7 +142,6 @@ export function HeroSection() {
   const [isLoaded, setIsLoaded] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [animationReady, setAnimationReady] = useState(false)
-  const [bgLoaded, setBgLoaded] = useState(false)
   const firstLoad = useRef(true)
   
   // 主题和路由
@@ -153,7 +152,7 @@ export function HeroSection() {
   const titleControls = useAnimationControls()
   const leftTextControls = useAnimationControls()
   const rightTextControls = useAnimationControls()
-  const bgControls = useAnimationControls()
+  const contentControls = useAnimationControls()
   
   // 添加强制重绘函数
   const forceRepaint = () => {
@@ -178,7 +177,6 @@ export function HeroSection() {
     const timer = setTimeout(() => {
       setIsLoaded(true)
       setAnimationReady(true)
-      setBgLoaded(true) // 背景加载完成
       if (DEBUG_MODE) console.log("初始组件挂载设置")
     }, 10)
     
@@ -187,16 +185,12 @@ export function HeroSection() {
     }
   }, [])
 
-  // 背景加载动画
-  useEffect(() => {
-    if (bgLoaded) {
-      bgControls.start("visible")
-    }
-  }, [bgLoaded, bgControls])
-
-  // 开始动画序列
+  // 内容加载动画
   useEffect(() => {
     if (isLoaded && animationReady) {
+      // 先开始内容渐显
+      contentControls.start("visible")
+      
       // 重置并启动标题动画
       titleControls.set("hidden")
       titleControls.start("visible")
@@ -212,7 +206,7 @@ export function HeroSection() {
             .then(() => rightTextControls.start("float"))
         })
     }
-  }, [isLoaded, animationReady, titleControls, leftTextControls, rightTextControls])
+  }, [isLoaded, animationReady, titleControls, leftTextControls, rightTextControls, contentControls])
 
   // 路由变化时重置动画状态
   useEffect(() => {
@@ -225,6 +219,7 @@ export function HeroSection() {
       forceRepaint()
       
       // 重置动画控制器
+      contentControls.set("hidden")
       titleControls.set("hidden")
       leftTextControls.set("initial")
       rightTextControls.set("initial")
@@ -235,6 +230,7 @@ export function HeroSection() {
         setAnimationReady(true)
         
         // 启动动画序列
+        contentControls.start("visible")
         titleControls.start("visible")
           .then(() => {
             leftTextControls.start("animate")
@@ -251,114 +247,111 @@ export function HeroSection() {
     } else {
       firstLoad.current = false
     }
-  }, [pathname, titleControls, leftTextControls, rightTextControls])
+  }, [pathname, titleControls, leftTextControls, rightTextControls, contentControls])
 
   // 如果组件未挂载，返回空内容
   if (!mounted) return null
 
   return (
-    <motion.div
-      variants={bgVariants}
-      initial="hidden"
-      animate={bgControls}
+    <HeroBg
+      minRadius={200}
+      maxRadius={400}
+      speedFactor={1.8} 
+      colors={['#836FFF', '#15F5BA', '#69F2FF']}
     >
-      <HeroBg
-        minRadius={200}
-        maxRadius={400}
-        speedFactor={1.8} 
-        colors={['#836FFF', '#15F5BA', '#69F2FF']}
+      <motion.div
+        id="hero" // 添加ID用于滚动指示器
+        ref={containerRef}
+        className="w-full h-full flex items-center justify-center transition-colors duration-300"
+        variants={contentVariants}
+        initial="hidden"
+        animate={contentControls}
       >
-        <div
-          id="hero" // 添加ID用于滚动指示器
-          ref={containerRef}
-          className="w-full h-full flex items-center justify-center transition-colors duration-300"
+        {/* 左侧文本 - 左上方位置 */}
+        <motion.div
+          className="absolute left-1/4 -translate-x-1/2 top-1/3 -translate-y-1/2"
+          variants={leftFloatVariants}
+          initial="initial"
+          animate={leftTextControls}
         >
-          {/* 左侧文本 - 左上方位置 */}
-          <motion.div
-            className="absolute left-1/4 -translate-x-1/2 top-1/3 -translate-y-1/2"
-            variants={leftFloatVariants}
-            initial="initial"
-            animate={leftTextControls}
+          <p
+            className={`text-sm md:text-base uppercase tracking-widest border-b pb-1 ${
+              theme === "dark" ? "text-white border-white" : "text-black border-black"
+            }`}
+            style={{ fontFamily: "var(--font-beatrice-display), sans-serif" }}
           >
-            <p
-              className={`text-sm md:text-base uppercase tracking-widest border-b pb-1 ${
-                theme === "dark" ? "text-white border-white" : "text-black border-black"
-              }`}
-              style={{ fontFamily: "var(--font-beatrice-display), sans-serif" }}
-            >
-              what we think
-            </p>
-          </motion.div>
+            what we think
+          </p>
+        </motion.div>
 
-          {/* 中央标题 */}
-          <motion.div
-            className="px-4"
-            variants={fadeInVariants}
-            initial="hidden"
-            animate={isLoaded ? "visible" : "hidden"}
+        {/* 中央标题 */}
+        <motion.div
+          className="px-4"
+          variants={fadeInVariants}
+          initial="hidden"
+          animate={isLoaded ? "visible" : "hidden"}
+        >
+          <motion.h1
+            className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-center ${
+              theme === "dark" ? "text-white" : "text-black"
+            } ${beatriceDisplay.className}`}
           >
-            <motion.h1
-              className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight text-center ${
-                theme === "dark" ? "text-white" : "text-black"
-              } ${beatriceDisplay.className}`}
-            >
-              <AnimatedCharacters 
-                text="Infinity Creators" 
-                controls={titleControls}
-              />
-            </motion.h1>
-          </motion.div>
+            <AnimatedCharacters 
+              text="Infinity Creators" 
+              controls={titleControls}
+            />
+          </motion.h1>
+        </motion.div>
 
-          {/* 右侧文本 - 右下方位置 */}
-          <motion.div
-            className="absolute right-1/4 translate-x-1/2 bottom-1/3 translate-y-1/2"
-            variants={rightFloatVariants}
-            initial="initial"
-            animate={rightTextControls}
+        {/* 右侧文本 - 右下方位置 */}
+        <motion.div
+          className="absolute right-1/4 translate-x-1/2 bottom-1/3 translate-y-1/2"
+          variants={rightFloatVariants}
+          initial="initial"
+          animate={rightTextControls}
+        >
+          <p
+            className={`text-sm md:text-base uppercase tracking-widest border-b pb-1 ${
+              theme === "dark" ? "text-white border-white" : "text-black border-black"
+            }`}
+            style={{ fontFamily: "var(--font-beatrice-display), sans-serif" }}
           >
-            <p
-              className={`text-sm md:text-base uppercase tracking-widest border-b pb-1 ${
-                theme === "dark" ? "text-white border-white" : "text-black border-black"
-              }`}
-              style={{ fontFamily: "var(--font-beatrice-display), sans-serif" }}
-            >
-              what we build
-            </p>
-          </motion.div>
+            what we build
+          </p>
+        </motion.div>
 
-          {/* 向下滚动指示器 */}
-          <motion.div 
-            className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.5, duration: 0.5 }}
+        {/* 向下滚动指示器 */}
+        <motion.div 
+          className="absolute bottom-8 left-1/2 transform -translate-x-1/2"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 0.5 }}
+        >
+          <motion.svg
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className={theme === "dark" ? "text-white" : "text-black"}
+            animate={{ y: [0, 8, 0] }}
+            transition={{
+              duration: 1.5,
+              repeat: Infinity,
+              repeatType: "loop",
+              ease: "easeInOut"
+            }}
           >
-            <motion.svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              className={theme === "dark" ? "text-white" : "text-black"}
-              animate={{ y: [0, 8, 0] }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                repeatType: "loop",
-                ease: "easeInOut"
-              }}
-            >
-              <path
-                d="M12 5V19M12 19L5 12M12 19L19 12"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </motion.svg>
-          </motion.div>
-        </div>
-      </HeroBg>
-    </motion.div>
+            <path
+              d="M12 5V19M12 19L5 12M12 19L19 12"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            />
+          </motion.svg>
+        </motion.div>
+      </motion.div>
+    </HeroBg>
   )
 }
